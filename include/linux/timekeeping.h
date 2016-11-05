@@ -310,4 +310,6 @@ void read_persistent_wall_and_boot_offset(struct timespec64 *wall_clock,
 extern int update_persistent_clock64(struct timespec64 now);
 #endif
 
+s64 get_total_sleep_time_nsec(void);
+
 #endif
