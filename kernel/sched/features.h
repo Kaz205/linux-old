@@ -103,3 +103,8 @@
 
 #define SCHED_FEAT_ALT_PERIOD 1
 #define SCHED_FEAT_BASE_SLICE 1
+
+/*
+ * Request max frequency from schedutil whenever a RT task is running.
+ */
+#define SCHED_FEAT_SUGOV_RT_MAX_FREQ 0
