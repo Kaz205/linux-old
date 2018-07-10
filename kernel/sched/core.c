@@ -7412,7 +7412,7 @@ unsigned long effective_cpu_util(int cpu, unsigned long util_cfs,
 
 	max = arch_scale_cpu_capacity(cpu);
 
-	if (!uclamp_is_used() &&
+	if (!uclamp_is_used() && sched_feat(SUGOV_RT_MAX_FREQ) &&
 	    type == FREQUENCY_UTIL && rt_rq_is_runnable(&rq->rt)) {
 		return max;
 	}
