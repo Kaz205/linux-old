@@ -101,3 +101,8 @@ SCHED_FEAT(LATENCY_WARN, false)
 
 SCHED_FEAT(ALT_PERIOD, true)
 SCHED_FEAT(BASE_SLICE, true)
+
+/*
+ * Request max frequency from schedutil whenever a RT task is running.
+ */
+SCHED_FEAT(SUGOV_RT_MAX_FREQ, false)
