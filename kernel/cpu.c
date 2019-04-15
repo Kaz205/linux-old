@@ -2622,6 +2622,22 @@ EXPORT_SYMBOL(__cpu_active_mask);
 struct cpumask __cpu_dying_mask __read_mostly;
 EXPORT_SYMBOL(__cpu_dying_mask);
 
+#ifdef CONFIG_LITTLE_CPU_MASK
+static const unsigned long lp_cpu_bits = CONFIG_LITTLE_CPU_MASK;
+const struct cpumask *const cpu_lp_mask = to_cpumask(&lp_cpu_bits);
+#else
+const struct cpumask *const cpu_lp_mask = cpu_possible_mask;
+#endif
+EXPORT_SYMBOL(cpu_lp_mask);
+
+#ifdef CONFIG_BIG_CPU_MASK
+static const unsigned long perf_cpu_bits = CONFIG_BIG_CPU_MASK;
+const struct cpumask *const cpu_perf_mask = to_cpumask(&perf_cpu_bits);
+#else
+const struct cpumask *const cpu_perf_mask = cpu_possible_mask;
+#endif
+EXPORT_SYMBOL(cpu_perf_mask);
+
 atomic_t __num_online_cpus __read_mostly;
 EXPORT_SYMBOL(__num_online_cpus);
 
