@@ -157,6 +157,8 @@ export KBUILD_EXTMOD
 # variable.
 
 # Do we want to change the working directory?
+KBUILD_OUTPUT := out
+
 ifeq ("$(origin O)", "command line")
   KBUILD_OUTPUT := $(O)
 endif
