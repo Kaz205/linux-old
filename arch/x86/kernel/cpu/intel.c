@@ -721,7 +721,8 @@ static void init_intel(struct cpuinfo_x86 *c)
 
 	split_lock_init();
 
-	intel_init_thermal(c);
+	if (IS_ENABLED(CONFIG_X86_THERMAL_VECTOR))
+		intel_init_thermal(c);
 }
 
 #ifdef CONFIG_X86_32
