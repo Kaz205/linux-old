@@ -9,7 +9,7 @@ ifdef CONFIG_LTO_GCC
 	CC_FLAGS_LTO_GCC := -flto
 	DISABLE_LTO_GCC := -fno-lto
 
-	KBUILD_CFLAGS += ${CC_FLAGS_LTO_GCC}
+	KBUILD_CFLAGS += ${CC_FLAGS_LTO_GCC} --param=max-inline-insns-auto=1000
 
 	lto-flags-y := -flto -flinker-output=nolto-rel -flto=jobserver
 	lto-flags-y += -fwhole-program
