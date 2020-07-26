@@ -565,6 +565,7 @@ static int bringup_cpu(unsigned int cpu)
 	return bringup_wait_for_ap(cpu);
 }
 
+#ifndef CONFIG_SCHED_MUQSS
 static int finish_cpu(unsigned int cpu)
 {
 	struct task_struct *idle = idle_thread_get(cpu);
@@ -579,6 +580,7 @@ static int finish_cpu(unsigned int cpu)
 	mmdrop(mm);
 	return 0;
 }
+#endif
 
 /*
  * Hotplug state machine related functions
