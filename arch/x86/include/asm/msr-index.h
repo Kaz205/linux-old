@@ -191,6 +191,8 @@
 #define GDS_MITG_DIS			BIT(4)	/* Disable GDS mitigation */
 #define GDS_MITG_LOCKED			BIT(5)	/* GDS mitigation locked */
 
+#define MSR_IA32_OC_MAILBOX		0x00000150
+
 #define MSR_IA32_SYSENTER_CS		0x00000174
 #define MSR_IA32_SYSENTER_ESP		0x00000175
 #define MSR_IA32_SYSENTER_EIP		0x00000176
