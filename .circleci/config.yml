@@ -1,0 +1,29 @@
+version: 2.1
+jobs:
+  compile:
+   docker:
+      - image: archlinux/base
+   steps:
+      - run:
+          command: |
+           pacman -Sy && pacman -S git bc base-devel pahole --needed --noconfirm
+           git clone https://github.com/Kaz205/pkgbuild linux-xps9350 -b linux-xps9350 -j$(nproc --all) --depth=1
+           cd linux-xps9350 && makepkg
+           cp *.zst /root/project/out
+           cd ..
+           git clone https://github.com/Kaz205/pkgbuild linux-cyan -b linux-cyan -j$(nproc --all) --depth=1
+           sed -i '1178,1189d' /usr/bin/makepkg
+           cd linux-cyan && makepkg
+           mkdir /root/project/out && cp *.zst /root/project/out
+           cd ..
+           git clone https://github.com/Kaz205/pkgbuild linux-an012tx -b linux-an012tx -j$(nproc --all) --depth=1
+           cd linux-an012tx && makepkg
+           cp *.zst /root/project/out
+
+      - store_artifacts:
+          path: /root/project/out
+workflows:
+  version: 2.1
+  cooking:
+    jobs:
+      - compile
