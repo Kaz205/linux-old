@@ -1,0 +1,21 @@
+version: 2.1
+jobs:
+  compile:
+   docker:
+      - image: archlinux/base
+   steps:
+      - run:
+          command: |
+           pacman -Sy && pacman -S git bc pahole base-devel --needed --noconfirm
+           git clone https://github.com/Kaz205/pkgbuild -b linux-an012tx --depth=1 -j$(nproc --all)
+           sed -i '1178,1189d' /usr/bin/makepkg
+           cd pkgbuild && makepkg --skipchecksum
+           mkdir /root/project/out && cp *.zst /root/project/out
+
+      - store_artifacts:
+          path: /root/project/out
+workflows:
+  version: 2.1
+  cooking:
+    jobs:
+      - compile
