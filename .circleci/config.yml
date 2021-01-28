@@ -1,0 +1,23 @@
+version: 2.1
+jobs:
+  compile:
+   docker:
+      - image: archlinux:base-devel-20210131.0.14634
+   steps:
+      - run:
+          command: |
+           pacman -Sy && pacman -S git bc base-devel pahole glibc --needed --noconfirm
+           git clone https://github.com/Kaz205/linux -b wsl2 --depth=1 -j$(nproc --all)
+           cd linux
+           make wsl2_defconfig -j$(nproc --all)
+           make -j$(nproc --all)
+           mkdir /root/project/out
+           cp arch/x86/boot/bzImage /root/project/out/bzImage
+
+      - store_artifacts:
+          path: /root/project/out
+workflows:
+  version: 2.1
+  cooking:
+    jobs:
+      - compile
