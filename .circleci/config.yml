@@ -1,0 +1,23 @@
+version: 2.1
+jobs:
+  compile:
+   docker:
+      - image: archlinux:base-devel
+   steps:
+      - run:
+          command: |
+           curl -LO "https://repo.archlinuxcn.org/x86_64/glibc-linux4-2.33-4-x86_64.pkg.tar.zst" && bsdtar -C / -xvf "glibc-linux4-2.33-4-x86_64.pkg.tar.zst"
+           pacman -Sy && pacman -S git bc base-devel pahole cpio --needed --noconfirm
+           cd;
+           git clone https://github.com/Kaz205/pkgbuild -b packages/linux --depth=1 -j$(nproc --all)
+           cd pkgbuild/trunk
+           sed -i '/E_ROOT/d' /usr/bin/makepkg
+           makepkg
+
+      - store_artifacts:
+          path: $HOME
+workflows:
+  version: 2.1
+  cooking:
+    jobs:
+      - compile
