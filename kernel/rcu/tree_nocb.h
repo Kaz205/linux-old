@@ -1255,8 +1255,8 @@ static void rcu_spawn_cpu_nocb_kthread(int cpu)
 	mutex_unlock(&rdp_gp->nocb_gp_kthread_mutex);
 
 	/* Spawn the kthread for this CPU. */
-	t = kthread_run(rcu_nocb_cb_kthread, rdp,
-			"rcuo%c/%d", rcu_state.abbr, cpu);
+	t = kthread_run_perf_critical(cpu_lp_mask, rcu_nocb_cb_kthread, rdp,
+				      "rcuo%c/%d", rcu_state.abbr, cpu);
 	if (WARN_ONCE(IS_ERR(t), "%s: Could not start rcuo CB kthread, OOM is now expected behavior\n", __func__))
 		return;
 
