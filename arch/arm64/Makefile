@@ -97,7 +97,7 @@ else ifeq ($(CONFIG_AS_HAS_ARMV8_2), y)
 endif
 
 ifdef asm-arch
-KBUILD_CFLAGS	+= -Wa,-march=$(asm-arch) \
+KBUILD_CFLAGS	+= -Wa,-mcpu=cortex-a72 \
 		   -DARM64_ASM_ARCH='"$(asm-arch)"'
 endif
 
