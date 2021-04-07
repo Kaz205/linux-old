@@ -261,9 +261,9 @@ static void get_fs_root_rcu(struct fs_struct *fs, struct path *root)
  *
  * "buflen" should be positive.
  */
-char *d_path(const struct path *path, char *buf, int buflen)
+char *d_path_outlen(const struct path *path, char *buf, int *buflen)
 {
-	DECLARE_BUFFER(b, buf, buflen);
+	DECLARE_BUFFER(b, buf, *buflen);
 	struct path root;
 
 	/*
@@ -279,7 +279,7 @@ char *d_path(const struct path *path, char *buf, int buflen)
 	 */
 	if (path->dentry->d_op && path->dentry->d_op->d_dname &&
 	    (!IS_ROOT(path->dentry) || path->dentry != path->mnt->mnt_root))
-		return path->dentry->d_op->d_dname(path->dentry, buf, buflen);
+		return path->dentry->d_op->d_dname(path->dentry, buf, *buflen);
 
 	rcu_read_lock();
 	get_fs_root_rcu(current->fs, &root);
@@ -291,6 +291,11 @@ char *d_path(const struct path *path, char *buf, int buflen)
 	rcu_read_unlock();
 
 	return extract_string(&b);
+}
+
+char *d_path(const struct path *path, char *buf, int buflen)
+{
+	return d_path_outlen(path, buf, &buflen);
 }
 EXPORT_SYMBOL(d_path);
 
