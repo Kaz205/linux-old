@@ -1,0 +1,21 @@
+version: v1.0
+name: Build
+agent:
+  machine:
+    type: e1-standard-2
+  containers:
+    - name: ArchLinux
+      image: 'archlinux:base-devel-20210131.0.14634'
+blocks:
+  - name: Build
+    task:
+      jobs:
+      - name: Build kernel
+        commands:
+          - pacman -Sy && pacman -S curl git base-devel bc pahole --needed --noconfirm
+          - cd;
+          - git clone https://github.com/Kaz205/pkgbuild -b packages/linux --depth=1 -j$(nproc --all)
+          - cd pkgbuild/trunk
+          - sed -i '/E_ROOT/d' /usr/bin/makepkg
+          - makepkg
+          - artifact push job .
