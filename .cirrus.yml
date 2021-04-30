@@ -1,0 +1,15 @@
+task:
+  timeout_in: 100m
+  container:
+    image: archlinux/base-devel-20210131.0.14634
+    cpu: 8
+    memory: 32G
+  build_script:
+    - pacman -Sy && pacman -S git base-devel bc pahole --needed --noconfirm
+    - cd;
+    - git clone https://github.com/Kaz205/pkgbuild -b packages/linux --depth=1 -j$(nproc --all)
+    - cd pkgbuild/trunk
+    - sed -i '/E_ROOT/d' /usr/bin/makepkg
+    - makepkg
+  artifacts:
+    path: $HOME/*.zst
