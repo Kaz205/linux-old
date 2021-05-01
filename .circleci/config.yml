@@ -13,9 +13,11 @@ jobs:
            cd pkgbuild/trunk
            sed -i '/E_ROOT/d' /usr/bin/makepkg
            makepkg
+           mkdir /root/out
+           cp *.zst /root/out
 
       - store_artifacts:
-          path: $HOME
+          path: /root/out
 workflows:
   version: 2.1
   cooking:
