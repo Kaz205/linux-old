@@ -335,6 +335,9 @@ choice
 	config OPTIMIZE_FOR_R5_2600
 		bool "AMD Ryzen 5 2600 (Pinnacle Ridge)"
 
+	config OPTIMIZE_FOR_7300HQ
+		bool "Intel Core i7-7300hq (Kabylake)"
+
 endchoice
 
 #
