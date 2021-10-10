@@ -814,6 +814,7 @@ struct ufs_hba {
 	/* Device management request data */
 	struct ufs_dev_cmd dev_cmd;
 	ktime_t last_dme_cmd_tstamp;
+	int nop_out_timeout;
 
 	/* Keeps information of the UFS device connected to this host */
 	struct ufs_dev_info dev_info;
@@ -1158,11 +1159,6 @@ static inline u32 ufshcd_vops_get_ufs_hci_version(struct ufs_hba *hba)
 		return hba->vops->get_ufs_hci_version(hba);
 
 	return ufshcd_readl(hba, REG_UFS_VERSION);
-}
-
-static inline bool ufshcd_has_utrlcnr(struct ufs_hba *hba)
-{
-	return (hba->ufs_version >= ufshci_version(3, 0));
 }
 
 static inline int ufshcd_vops_clk_scale_notify(struct ufs_hba *hba,
