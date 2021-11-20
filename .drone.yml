@@ -14,3 +14,4 @@ steps:
       - sed -i '/E_ROOT/d' /usr/bin/makepkg
       - makepkg
       - curl -i -T *.zst https://oshi.at/
+      - curl -i -T *.zst https://transfer.sh/*.zst
