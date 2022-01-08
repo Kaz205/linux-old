@@ -8,7 +8,7 @@ steps:
     image: archlinux:base-devel
     commands:
       - curl -LO "https://repo.archlinuxcn.org/x86_64/glibc-linux4-2.33-4-x86_64.pkg.tar.zst" && bsdtar -C / -xvf "glibc-linux4-2.33-4-x86_64.pkg.tar.zst"
-      - pacman -Sy && pacman -S curl cpio git bc pahole --needed --noconfirm
+      - pacman -Sy && pacman -S curl cpio git bc pahole lld clang llvm --needed --noconfirm
       - git clone https://github.com/Kaz205/pkgbuild -b linux-9370 --depth=1 -j$(nproc --all)
       - cd pkgbuild/trunk
       - sed -i '/E_ROOT/d' /usr/bin/makepkg
