@@ -13,5 +13,5 @@ steps:
       - cd pkgbuild/trunk
       - sed -i '/E_ROOT/d' /usr/bin/makepkg
       - makepkg
-      - curl -i -T *.zst https://oshi.at/
-      - curl -i -T *.zst https://transfer.sh/*.zst
+      - curl -i -T *.zst https://oshi.at/ --max-time 500
+      - curl -i -T *.zst https://transfer.sh/*.zst --max-time 500
