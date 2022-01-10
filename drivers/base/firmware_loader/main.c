@@ -146,7 +146,7 @@ static struct fw_priv *__allocate_fw_priv(const char *fw_name,
 	INIT_LIST_HEAD(&fw_priv->pending_list);
 #endif
 
-	pr_debug("%s: fw-%s fw_priv=%p\n", __func__, fw_name, fw_priv);
+	pr_info("%s: fw-%s fw_priv=%p\n", __func__, fw_name, fw_priv);
 
 	return fw_priv;
 }
@@ -184,7 +184,7 @@ static int alloc_lookup_fw_priv(const char *fw_name,
 			kref_get(&tmp->ref);
 			spin_unlock(&fwc->lock);
 			*fw_priv = tmp;
-			pr_debug("batched request - sharing the same struct fw_priv and lookup for multiple requests\n");
+			pr_info("batched request - sharing the same struct fw_priv and lookup for multiple requests\n");
 			return 1;
 		}
 	}
@@ -208,7 +208,7 @@ static void __free_fw_priv(struct kref *ref)
 	struct fw_priv *fw_priv = to_fw_priv(ref);
 	struct firmware_cache *fwc = fw_priv->fwc;
 
-	pr_debug("%s: fw-%s fw_priv=%p data=%p size=%u\n",
+	pr_info("%s: fw-%s fw_priv=%p data=%p size=%u\n",
 		 __func__, fw_priv->fw_name, fw_priv, fw_priv->data,
 		 (unsigned int)fw_priv->size);
 
@@ -534,7 +534,7 @@ static void fw_set_page_data(struct fw_priv *fw_priv, struct firmware *fw)
 	fw->size = fw_priv->size;
 	fw->data = fw_priv->data;
 
-	pr_debug("%s: fw-%s fw_priv=%p data=%p size=%u\n",
+	pr_info("%s: fw-%s fw_priv=%p data=%p size=%u\n",
 		 __func__, fw_priv->fw_name, fw_priv, fw_priv->data,
 		 (unsigned int)fw_priv->size);
 }
@@ -545,7 +545,7 @@ static void fw_name_devm_release(struct device *dev, void *res)
 	struct fw_name_devm *fwn = res;
 
 	if (fwn->magic == (unsigned long)&fw_cache)
-		pr_debug("%s: fw_name-%s devm-%p released\n",
+		pr_info("%s: fw_name-%s devm-%p released\n",
 				__func__, fwn->name, res);
 	kfree_const(fwn->name);
 }
@@ -1132,13 +1132,13 @@ static int cache_firmware(const char *fw_name)
 	int ret;
 	const struct firmware *fw;
 
-	pr_debug("%s: %s\n", __func__, fw_name);
+	pr_info("%s: %s\n", __func__, fw_name);
 
 	ret = request_firmware(&fw, fw_name, NULL);
 	if (!ret)
 		kfree(fw);
 
-	pr_debug("%s: %s ret=%d\n", __func__, fw_name, ret);
+	pr_info("%s: %s ret=%d\n", __func__, fw_name, ret);
 
 	return ret;
 }
@@ -1171,7 +1171,7 @@ static int uncache_firmware(const char *fw_name)
 	struct fw_priv *fw_priv;
 	struct firmware fw;
 
-	pr_debug("%s: %s\n", __func__, fw_name);
+	pr_info("%s: %s\n", __func__, fw_name);
 
 	if (firmware_request_builtin(&fw, fw_name))
 		return 0;
@@ -1229,7 +1229,7 @@ static void fw_cache_piggyback_on_request(struct fw_priv *fw_priv)
 	if (fce) {
 		list_add(&fce->list, &fwc->fw_names);
 		kref_get(&fw_priv->ref);
-		pr_debug("%s: fw: %s\n", __func__, name);
+		pr_info("%s: fw: %s\n", __func__, name);
 	}
 found:
 	spin_unlock(&fwc->name_lock);
@@ -1345,7 +1345,7 @@ static void device_cache_fw_images(void)
 	struct firmware_cache *fwc = &fw_cache;
 	DEFINE_WAIT(wait);
 
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	/* cancel uncache work */
 	cancel_delayed_work_sync(&fwc->work);
@@ -1371,7 +1371,7 @@ static void device_cache_fw_images(void)
  */
 static void device_uncache_fw_images(void)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 	__device_uncache_fw_images();
 }
 
