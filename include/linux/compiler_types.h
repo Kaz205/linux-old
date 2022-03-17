@@ -139,14 +139,8 @@ struct ftrace_likely_data {
 
 #define __compiler_offsetof(a, b)	__builtin_offsetof(a, b)
 
-/*
- * Prefer gnu_inline, so that extern inline functions do not emit an
- * externally visible function. This makes extern inline behave as per gnu89
- * semantics rather than c99. This prevents multiple symbol definition errors
- * of extern inline functions at link time.
- * A lot of inline functions can cause havoc with function tracing.
- */
-#define inline inline __gnu_inline __inline_maybe_unused notrace
+#define inline inline __attribute__((__always_inline__)) __gnu_inline \
+	__inline_maybe_unused notrace
 
 /*
  * gcc provides both __inline__ and __inline as alternate spellings of
