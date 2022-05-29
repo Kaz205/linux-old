@@ -544,7 +544,8 @@ int mt792x_init_wiphy(struct ieee80211_hw *hw)
 		wiphy->n_iface_combinations = ARRAY_SIZE(if_comb);
 	}
 	wiphy->flags &= ~(WIPHY_FLAG_IBSS_RSN | WIPHY_FLAG_4ADDR_AP |
-			  WIPHY_FLAG_4ADDR_STATION);
+			  WIPHY_FLAG_4ADDR_STATION |
+			  WIPHY_FLAG_PS_ON_BY_DEFAULT);
 	wiphy->interface_modes = BIT(NL80211_IFTYPE_STATION) |
 				 BIT(NL80211_IFTYPE_AP) |
 				 BIT(NL80211_IFTYPE_P2P_CLIENT) |
