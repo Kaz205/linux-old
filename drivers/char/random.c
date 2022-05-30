@@ -466,7 +466,7 @@ static struct crng_state primary_crng = {
  */
 static int crng_init = 0;
 static bool crng_need_final_init = false;
-#define crng_ready() (true)
+#define crng_ready() (likely(crng_init > 1))
 static int crng_init_cnt = 0;
 static unsigned long crng_global_init_time = 0;
 #define CRNG_INIT_CNT_THRESH (2 * CHACHA_KEY_SIZE)
