@@ -161,6 +161,3 @@ x509.genkey
 
 # Documentation toolchain
 sphinx_*/
-
-# Object directory
-out/
