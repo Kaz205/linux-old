@@ -7052,6 +7052,7 @@ static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu)
 	struct perf_domain *pd;
 	struct energy_env eenv;
 
+	pr_info_once("EAS is being used!");
 	rcu_read_lock();
 	pd = rcu_dereference(rd->pd);
 	if (!pd || READ_ONCE(rd->overutilized))
