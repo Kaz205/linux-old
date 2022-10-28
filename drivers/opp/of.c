@@ -587,6 +587,7 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 	struct property *prop_mv = NULL, *prop_ma = NULL, *prop_mw = NULL;
 	char name[NAME_MAX];
 
+	pr_info("opp_parse_supplies");
 	/* Search for "opp-microvolt-<name>" */
 	if (opp_table->prop_name) {
 		snprintf(name, sizeof(name), "opp-microvolt-%s",
@@ -690,6 +691,7 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 	prop_mw = of_find_property(opp->np, name, NULL);
 
 	if (prop_mw) {
+		pr_info("opp-microwatt exists!");
 		pcount = of_property_count_u32_elems(opp->np, name);
 		if (pcount < 0) {
 			dev_err(dev, "%s: Invalid %s property (%d)\n", __func__,
@@ -720,6 +722,8 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 			ret = -EINVAL;
 			goto free_microwatt;
 		}
+	} else {
+		pr_info("opp-microwatt doesn't exist!");
 	}
 
 	for (i = 0, j = 0; i < supplies; i++) {
@@ -931,7 +935,7 @@ static struct dev_pm_opp *_opp_add_static_v2(struct opp_table *opp_table,
 
 	/* Check if the OPP supports hardware's hierarchy of versions or not */
 	if (!_opp_is_supported(dev, opp_table, np)) {
-		dev_dbg(dev, "OPP not supported by hardware: %s\n",
+		dev_info(dev, "OPP not supported by hardware: %s\n",
 			of_node_full_name(np));
 		goto free_opp;
 	}
@@ -943,21 +947,26 @@ static struct dev_pm_opp *_opp_add_static_v2(struct opp_table *opp_table,
 	new_opp->available = true;
 
 	ret = _of_opp_alloc_required_opps(opp_table, new_opp);
-	if (ret)
+	if (ret) {
+		pr_info("_of_opp_alloc_required_opps");
 		goto free_opp;
+	}
 
 	if (!of_property_read_u32(np, "clock-latency-ns", &val))
 		new_opp->clock_latency_ns = val;
 
 	ret = opp_parse_supplies(new_opp, dev, opp_table);
-	if (ret)
+	if (ret) {
+		pr_info("opp_parse_supplies fail");
 		goto free_required_opps;
+	}
 
 	if (opp_table->is_genpd)
 		new_opp->pstate = pm_genpd_opp_to_performance_state(dev, new_opp);
 
 	ret = _opp_add(dev, new_opp, opp_table);
 	if (ret) {
+		pr_info("_opp_add");
 		/* Don't return error for duplicate OPPs */
 		if (ret == -EBUSY)
 			ret = 0;
@@ -982,7 +991,7 @@ static struct dev_pm_opp *_opp_add_static_v2(struct opp_table *opp_table,
 	if (new_opp->clock_latency_ns > opp_table->clock_latency_ns_max)
 		opp_table->clock_latency_ns_max = new_opp->clock_latency_ns;
 
-	pr_debug("%s: turbo:%d rate:%lu uv:%lu uvmin:%lu uvmax:%lu latency:%lu level:%u\n",
+	pr_info("AAAA %s: turbo:%d rate:%lu uv:%lu uvmin:%lu uvmax:%lu latency:%lu level:%u\n",
 		 __func__, new_opp->turbo, new_opp->rates[0],
 		 new_opp->supplies[0].u_volt, new_opp->supplies[0].u_volt_min,
 		 new_opp->supplies[0].u_volt_max, new_opp->clock_latency_ns,
@@ -1014,6 +1023,7 @@ static int _of_add_opp_table_v2(struct device *dev, struct opp_table *opp_table)
 	mutex_lock(&opp_table->lock);
 	if (opp_table->parsed_static_opps) {
 		opp_table->parsed_static_opps++;
+		pr_info("AAAA OPP table is already initialized for the device");
 		mutex_unlock(&opp_table->lock);
 		return 0;
 	}
@@ -1034,6 +1044,8 @@ static int _of_add_opp_table_v2(struct device *dev, struct opp_table *opp_table)
 			count++;
 		}
 	}
+
+	pr_info("AAAA skip");
 
 	/* There should be one or more OPPs defined */
 	if (!count) {
@@ -1137,17 +1149,22 @@ static int _of_add_table_indexed(struct device *dev, int index)
 	}
 
 	opp_table = _add_opp_table_indexed(dev, index, true);
-	if (IS_ERR(opp_table))
+	if (IS_ERR(opp_table)) {
+		pr_info("IS_ERR opp table");
 		return PTR_ERR(opp_table);
+	}
 
 	/*
 	 * OPPs have two version of bindings now. Also try the old (v1)
 	 * bindings for backward compatibility with older dtbs.
 	 */
-	if (opp_table->np)
+	if (opp_table->np) {
+		pr_info("_of_add_opp_table_v2");
 		ret = _of_add_opp_table_v2(dev, opp_table);
-	else
+	} else {
+		pr_info("_of_add_opp_table_v1");
 		ret = _of_add_opp_table_v1(dev, opp_table);
+	}
 
 	if (ret)
 		dev_pm_opp_put_opp_table(opp_table);
@@ -1532,13 +1549,17 @@ static bool _of_has_opp_microwatt_property(struct device *dev)
 
 	/* Check if at least one OPP has needed property */
 	opp = dev_pm_opp_find_freq_ceil(dev, &freq);
-	if (IS_ERR(opp))
+	if (IS_ERR(opp)) {
+		pr_info("AAAA IS_ERR opp");
 		return false;
+	}
 
 	power = dev_pm_opp_get_power(opp);
 	dev_pm_opp_put(opp);
-	if (!power)
+	if (!power) {
+		pr_info("AAAA power");
 		return false;
+	}
 
 	return true;
 }
@@ -1562,24 +1583,28 @@ int dev_pm_opp_of_register_em(struct device *dev, struct cpumask *cpus)
 	u32 cap;
 
 	if (IS_ERR_OR_NULL(dev)) {
+		pr_info("IS_ERR_OR_NULL dev");
 		ret = -EINVAL;
 		goto failed;
 	}
 
 	nr_opp = dev_pm_opp_get_opp_count(dev);
 	if (nr_opp <= 0) {
+		pr_info("dev_pm_opp_get_opp_count");
 		ret = -EINVAL;
 		goto failed;
 	}
 
 	/* First, try to find more precised Energy Model in DT */
 	if (_of_has_opp_microwatt_property(dev)) {
+		pr_info("_of_has_opp_microwatt_property");
 		EM_SET_ACTIVE_POWER_CB(em_cb, _get_dt_power);
 		goto register_em;
 	}
 
 	np = of_node_get(dev->of_node);
 	if (!np) {
+		pr_info("of_node_get");
 		ret = -EINVAL;
 		goto failed;
 	}
@@ -1594,7 +1619,7 @@ int dev_pm_opp_of_register_em(struct device *dev, struct cpumask *cpus)
 	ret = of_property_read_u32(np, "dynamic-power-coefficient", &cap);
 	of_node_put(np);
 	if (ret || !cap) {
-		dev_dbg(dev, "Couldn't find proper 'dynamic-power-coefficient' in DT\n");
+		dev_info(dev, "Couldn't find proper 'dynamic-power-coefficient' in DT\n");
 		ret = -EINVAL;
 		goto failed;
 	}
@@ -1603,13 +1628,15 @@ int dev_pm_opp_of_register_em(struct device *dev, struct cpumask *cpus)
 
 register_em:
 	ret = em_dev_register_perf_domain(dev, nr_opp, &em_cb, cpus, true);
-	if (ret)
+	if (ret) {
+		pr_info("em_dev_register_perf_domain");
 		goto failed;
+	}
 
 	return 0;
 
 failed:
-	dev_dbg(dev, "Couldn't register Energy Model %d\n", ret);
+	dev_info(dev, "Couldn't register Energy Model %d\n", ret);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(dev_pm_opp_of_register_em);

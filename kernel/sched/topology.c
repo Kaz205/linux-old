@@ -331,12 +331,10 @@ static void destroy_perf_domain_rcu(struct rcu_head *rp)
 static void sched_energy_set(bool has_eas)
 {
 	if (!has_eas && static_branch_unlikely(&sched_energy_present)) {
-		if (sched_debug())
-			pr_info("%s: stopping EAS\n", __func__);
+		pr_info("%s: stopping EAS\n", __func__);
 		static_branch_disable_cpuslocked(&sched_energy_present);
 	} else if (has_eas && !static_branch_unlikely(&sched_energy_present)) {
-		if (sched_debug())
-			pr_info("%s: starting EAS\n", __func__);
+		pr_info("%s: starting EAS\n", __func__);
 		static_branch_enable_cpuslocked(&sched_energy_present);
 	}
 }
@@ -374,15 +372,15 @@ static bool build_perf_domains(const struct cpumask *cpu_map)
 	int cpu = cpumask_first(cpu_map);
 	struct root_domain *rd = cpu_rq(cpu)->rd;
 
-	if (!sysctl_sched_energy_aware)
+	if (!sysctl_sched_energy_aware) {
+		pr_info("No sysctl_sched_energy_aware");
 		goto free;
+	}
 
 	/* EAS is enabled for asymmetric CPU capacity topologies. */
 	if (!per_cpu(sd_asym_cpucapacity, cpu)) {
-		if (sched_debug()) {
-			pr_info("rd %*pbl: CPUs do not have asymmetric capacities\n",
-					cpumask_pr_args(cpu_map));
-		}
+		pr_info("rd %*pbl: CPUs do not have asymmetric capacities\n",
+				cpumask_pr_args(cpu_map));
 		goto free;
 	}
 
@@ -394,10 +392,8 @@ static bool build_perf_domains(const struct cpumask *cpu_map)
 	}
 
 	if (!arch_scale_freq_invariant()) {
-		if (sched_debug()) {
-			pr_warn("rd %*pbl: Disabling EAS: frequency-invariant load tracking not yet supported",
-				cpumask_pr_args(cpu_map));
-		}
+		pr_warn("rd %*pbl: Disabling EAS: frequency-invariant load tracking not yet supported",
+			cpumask_pr_args(cpu_map));
 		goto free;
 	}
 
@@ -2603,6 +2599,11 @@ match2:
 match3:
 		;
 	}
+	if (has_eas)
+		pr_info("sched_energy_set enabled");
+	else
+		pr_info("sched_energy_set disabled");
+
 	sched_energy_set(has_eas);
 #endif
 
