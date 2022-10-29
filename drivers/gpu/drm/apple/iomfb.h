@@ -210,6 +210,7 @@ enum dcpep_method {
 	iomfbep_a131_pmu_service_matched,
 	iomfbep_a132_backlight_service_matched,
 	iomfbep_a358_vi_set_temperature_hint,
+	dcpep_swap_set_color_matrix,
 	dcpep_num_methods
 };
 
@@ -325,6 +326,19 @@ struct dcp_swap_submit_resp {
 	u8 unkoutbool;
 	u32 ret;
 	u8 padding[3];
+} __packed;
+
+struct dcpep_swap_set_color_matrix_req {
+    u64 matrix[5][3];
+    u32 func;
+    u32 unk;
+    u8 matrix_null;
+    u8 padding[3];
+} __packed;
+
+struct dcpep_swap_set_color_matrix_resp {
+    u64 matrix[5][3];
+    u32 ret;
 } __packed;
 
 struct dc_swap_complete_resp {
