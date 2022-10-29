@@ -584,86 +584,76 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 	u32 *microvolt, *microamp = NULL, *microwatt = NULL;
 	int supplies = opp_table->regulator_count;
 	int vcount, icount, pcount, ret, i, j;
-	struct property *prop = NULL;
+	struct property *prop_mv = NULL, *prop_ma = NULL, *prop_mw = NULL;
 	char name[NAME_MAX];
 
 	/* Search for "opp-microvolt-<name>" */
 	if (opp_table->prop_name) {
 		snprintf(name, sizeof(name), "opp-microvolt-%s",
 			 opp_table->prop_name);
-		prop = of_find_property(opp->np, name, NULL);
-	}
-
-	if (!prop) {
-		/* Search for "opp-microvolt" */
-		sprintf(name, "opp-microvolt");
-		prop = of_find_property(opp->np, name, NULL);
-
-		/* Missing property isn't a problem, but an invalid entry is */
-		if (!prop) {
-			if (unlikely(supplies == -1)) {
-				/* Initialize regulator_count */
-				opp_table->regulator_count = 0;
-				return 0;
-			}
-
-			if (!supplies)
-				return 0;
-
-			dev_err(dev, "%s: opp-microvolt missing although OPP managing regulators\n",
-				__func__);
-			return -EINVAL;
+		prop_mv = of_find_property(opp->np, name, NULL);
+		if (unlikely(supplies == -1)) {
+			/* Initialize regulator_count */
+			supplies = opp_table->regulator_count = 1;
 		}
 	}
 
-	if (unlikely(supplies == -1)) {
-		/* Initialize regulator_count */
-		supplies = opp_table->regulator_count = 1;
-	} else if (unlikely(!supplies)) {
-		dev_err(dev, "%s: opp-microvolt wasn't expected\n", __func__);
-		return -EINVAL;
+	if (!prop_mv) {
+		/* Search for "opp-microvolt" */
+		sprintf(name, "opp-microvolt");
+		prop_mv = of_find_property(opp->np, name, NULL);
+
+		/* Missing property isn't a problem, but an invalid entry is */
+		if (!prop_mv) {
+			if (unlikely(supplies == -1)) {
+				/* Initialize regulator_count */
+				opp_table->regulator_count = 0;
+			}
+
+			dev_info(dev, "%s: opp-microvolt missing although OPP managing regulators\n",
+				 __func__);
+		}
 	}
 
-	vcount = of_property_count_u32_elems(opp->np, name);
-	if (vcount < 0) {
-		dev_err(dev, "%s: Invalid %s property (%d)\n",
-			__func__, name, vcount);
-		return vcount;
-	}
+	if (prop_mv) {
+		vcount = of_property_count_u32_elems(opp->np, name);
+		if (vcount < 0)
+			dev_info(dev, "%s: Invalid %s property (%d)\n",
+				__func__, name, vcount);
 
-	/* There can be one or three elements per supply */
-	if (vcount != supplies && vcount != supplies * 3) {
-		dev_err(dev, "%s: Invalid number of elements in %s property (%d) with supplies (%d)\n",
-			__func__, name, vcount, supplies);
-		return -EINVAL;
-	}
+		/* There can be one or three elements per supply */
+		if (vcount != supplies && vcount != supplies * 3) {
+			dev_err(dev, "%s: Invalid number of elements in %s property (%d) with supplies (%d)\n",
+				__func__, name, vcount, supplies);
+			return -EINVAL;
+		}
 
-	microvolt = kmalloc_array(vcount, sizeof(*microvolt), GFP_KERNEL);
-	if (!microvolt)
-		return -ENOMEM;
+		microvolt = kmalloc_array(vcount, sizeof(*microvolt), GFP_KERNEL);
+		if (!microvolt)
+			return -ENOMEM;
 
-	ret = of_property_read_u32_array(opp->np, name, microvolt, vcount);
-	if (ret) {
-		dev_err(dev, "%s: error parsing %s: %d\n", __func__, name, ret);
-		ret = -EINVAL;
-		goto free_microvolt;
+		ret = of_property_read_u32_array(opp->np, name, microvolt, vcount);
+		if (ret) {
+			dev_err(dev, "%s: error parsing %s: %d\n", __func__, name, ret);
+			ret = -EINVAL;
+			goto free_microvolt;
+		}
 	}
 
 	/* Search for "opp-microamp-<name>" */
-	prop = NULL;
 	if (opp_table->prop_name) {
 		snprintf(name, sizeof(name), "opp-microamp-%s",
 			 opp_table->prop_name);
-		prop = of_find_property(opp->np, name, NULL);
+		prop_ma = of_find_property(opp->np, name, NULL);
 	}
 
-	if (!prop) {
+	if (!prop_ma) {
 		/* Search for "opp-microamp" */
 		sprintf(name, "opp-microamp");
-		prop = of_find_property(opp->np, name, NULL);
+		prop_ma = of_find_property(opp->np, name, NULL);
 	}
 
-	if (prop) {
+	if (prop_ma) {
 		icount = of_property_count_u32_elems(opp->np, name);
 		if (icount < 0) {
 			dev_err(dev, "%s: Invalid %s property (%d)\n", __func__,
@@ -697,9 +687,9 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 
 	/* Search for "opp-microwatt" */
 	sprintf(name, "opp-microwatt");
-	prop = of_find_property(opp->np, name, NULL);
+	prop_mw = of_find_property(opp->np, name, NULL);
 
-	if (prop) {
+	if (prop_mw) {
 		pcount = of_property_count_u32_elems(opp->np, name);
 		if (pcount < 0) {
 			dev_err(dev, "%s: Invalid %s property (%d)\n", __func__,
@@ -733,14 +723,16 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 	}
 
 	for (i = 0, j = 0; i < supplies; i++) {
-		opp->supplies[i].u_volt = microvolt[j++];
+		if (microvolt) {
+			opp->supplies[i].u_volt = microvolt[j++];
 
-		if (vcount == supplies) {
-			opp->supplies[i].u_volt_min = opp->supplies[i].u_volt;
-			opp->supplies[i].u_volt_max = opp->supplies[i].u_volt;
-		} else {
-			opp->supplies[i].u_volt_min = microvolt[j++];
-			opp->supplies[i].u_volt_max = microvolt[j++];
+			if (vcount == supplies) {
+				opp->supplies[i].u_volt_min = opp->supplies[i].u_volt;
+				opp->supplies[i].u_volt_max = opp->supplies[i].u_volt;
+			} else {
+				opp->supplies[i].u_volt_min = microvolt[j++];
+				opp->supplies[i].u_volt_max = microvolt[j++];
+			}
 		}
 
 		if (microamp)
@@ -753,9 +745,11 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 free_microwatt:
 	kfree(microwatt);
 free_microamp:
-	kfree(microamp);
+	if (prop_ma)
+		kfree(microamp);
 free_microvolt:
-	kfree(microvolt);
+	if (prop_mv)
+		kfree(microvolt);
 
 	return ret;
 }
