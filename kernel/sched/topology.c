@@ -372,6 +372,7 @@ static bool build_perf_domains(const struct cpumask *cpu_map)
 	int cpu = cpumask_first(cpu_map);
 	struct root_domain *rd = cpu_rq(cpu)->rd;
 
+	pr_info("build_perf_domains()");
 	if (!sysctl_sched_energy_aware) {
 		pr_info("No sysctl_sched_energy_aware");
 		goto free;
@@ -2586,6 +2587,7 @@ match2:
 
 #if defined(CONFIG_ENERGY_MODEL) && defined(CONFIG_CPU_FREQ_GOV_SCHEDUTIL)
 	/* Build perf. domains: */
+	pr_info("AAAA build perf domains");
 	for (i = 0; i < ndoms_new; i++) {
 		for (j = 0; j < n && !sched_energy_update; j++) {
 			if (cpumask_equal(doms_new[i], doms_cur[j]) &&
