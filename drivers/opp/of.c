@@ -608,7 +608,7 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 		if (!prop_mv) {
 			if (unlikely(supplies == -1)) {
 				/* Initialize regulator_count */
-				opp_table->regulator_count = 0;
+				supplies = opp_table->regulator_count = 0;
 			}
 
 			dev_info(dev, "%s: opp-microvolt missing although OPP managing regulators\n",
