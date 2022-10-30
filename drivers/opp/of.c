@@ -583,7 +583,7 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 {
 	u32 *microvolt = NULL, *microamp = NULL, *microwatt = NULL;
 	int supplies = opp_table->regulator_count;
-	int vcount, icount, pcount, ret, i, j;
+	int vcount = 0, icount = 0, pcount = 0, ret = 0, i, j;
 	struct property *prop_mv = NULL, *prop_ma = NULL, *prop_mw = NULL;
 	char name[NAME_MAX];
 
@@ -598,16 +598,12 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 		/* Search for "opp-microvolt" */
 		sprintf(name, "opp-microvolt");
 		prop_mv = of_find_property(opp->np, name, NULL);
-
 	}
 
 	if (prop_mv) {
 		vcount = of_property_count_u32_elems(opp->np, name);
 		if (unlikely(supplies == -1))
 			supplies = opp_table->regulator_count = vcount;
-	} else {
-		prop_mv = NULL;
-		vcount = 0;
 	}
 
 	if (vcount < 0) {
@@ -647,22 +643,19 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 		/* Search for "opp-microamp" */
 		sprintf(name, "opp-microamp");
 		prop_ma = of_find_property(opp->np, name, NULL);
-
 	}
 
 	if (prop_ma) {
 		icount = of_property_count_u32_elems(opp->np, name);
 		if (unlikely(supplies == -1))
 			supplies = opp_table->regulator_count = icount;
-	} else {
-		prop_ma = NULL;
-		icount = 0;
 	}
 
 	if (icount < 0) {
 		dev_err(dev, "%s: Invalid %s property (%d)\n",
 			__func__, name, icount);
-		return icount;
+		ret = icount;
+		goto free_microvolt;
 	}
 
 	if (icount) {
@@ -670,12 +663,15 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 		if (icount != supplies && icount != supplies * 3) {
 			dev_err(dev, "%s: Invalid number of elements in %s property (%d) with supplies (%d)\n",
 				__func__, name, icount, supplies);
-			return -EINVAL;
+			ret = -EINVAL;
+			goto free_microvolt;
 		}
 
 		microamp = kmalloc_array(icount, sizeof(*microamp), GFP_KERNEL);
-		if (!microamp)
-			return -ENOMEM;
+		if (!microamp) {
+			ret = -ENOMEM;
+			goto free_microvolt;
+		}
 
 		ret = of_property_read_u32_array(opp->np, name, microamp, icount);
 		if (ret) {
@@ -696,22 +692,19 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 		/* Search for "opp-microwatt" */
 		sprintf(name, "opp-microwatt");
 		prop_mw = of_find_property(opp->np, name, NULL);
-
 	}
 
 	if (prop_mw) {
 		pcount = of_property_count_u32_elems(opp->np, name);
 		if (unlikely(supplies == -1))
 			supplies = opp_table->regulator_count = pcount;
-	} else {
-		prop_mw = NULL;
-		pcount = 0;
 	}
 
-	if (pcount < 0) {
+	if (pcount < 0)
 		dev_err(dev, "%s: Invalid %s property (%d)\n",
 			__func__, name, pcount);
-		return pcount;
+		ret = pcount;
+		goto free_microamp;
 	}
 
 	if (pcount) {
@@ -719,12 +712,15 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 		if (pcount != supplies && pcount != supplies * 3) {
 			dev_err(dev, "%s: Invalid number of elements in %s property (%d) with supplies (%d)\n",
 				__func__, name, pcount, supplies);
-			return -EINVAL;
+			ret = -EINVAL;
+			goto free_microamp;
 		}
 
 		microwatt = kmalloc_array(pcount, sizeof(*microwatt), GFP_KERNEL);
-		if (!microwatt)
-			return -ENOMEM;
+		if (!microwatt) {
+			ret = -ENOMEM;
+			goto free_microamp;
+		}
 
 		ret = of_property_read_u32_array(opp->np, name, microwatt, pcount);
 		if (ret) {
@@ -737,7 +733,7 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 	/* No supplies associated with the OPP */
 	if (unlikely(supplies == -1)) {
 		supplies = opp_table->regulator_count = 0;
-		return 0;
+		goto free_microwatt;
 	}
 
 	for (i = 0, j = 0; i < supplies; i++) {
@@ -761,11 +757,14 @@ static int opp_parse_supplies(struct dev_pm_opp *opp, struct device *dev,
 	}
 
 free_microwatt:
-	kfree(microwatt);
+	if (pcount)
+		kfree(microwatt);
 free_microamp:
-	kfree(microamp);
+	if (icount)
+		kfree(microamp);
 free_microvolt:
-	kfree(microvolt);
+	if (vcount)
+		kfree(microvolt);
 
 	return ret;
 }
