@@ -66,6 +66,14 @@ struct dcp_fb_reference {
 
 #define MAX_NOTCH_HEIGHT 160
 
+struct dcp_brightness {
+	u32 dac;
+	int nits;
+	int set;
+	int scale;
+	bool update;
+};
+
 /* TODO: move IOMFB members to its own struct */
 struct apple_dcp {
 	struct device *dev;
@@ -130,6 +138,9 @@ struct apple_dcp {
 	struct dcp_display_mode *modes;
 	unsigned int nr_modes;
 
+	/* Attributes of the connector */
+	int connector_type;
+
 	/* Attributes of the connected display */
 	int width_mm, height_mm;
 
@@ -149,6 +160,10 @@ struct apple_dcp {
 	struct apple_dcp_afkep *dptxep;
 
 	struct dptx_port dptxport[2];
+
+	struct dcp_brightness brightness;
 };
+
+int dcp_backlight_register(struct apple_dcp *dcp);
 
 #endif /* __APPLE_DCP_INTERNAL_H__ */
