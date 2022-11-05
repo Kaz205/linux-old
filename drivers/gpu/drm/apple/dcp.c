@@ -220,6 +220,13 @@ int dcp_crtc_atomic_check(struct drm_crtc *crtc, struct drm_atomic_state *state)
 }
 EXPORT_SYMBOL_GPL(dcp_crtc_atomic_check);
 
+void dcp_send_message(struct apple_dcp *dcp, u8 endpoint, u64 message)
+{
+	trace_dcp_send_msg(dcp, endpoint, message);
+	apple_rtkit_send_message(dcp->rtk, endpoint, message, NULL,
+				 false);
+}
+
 void dcp_link(struct platform_device *pdev, struct apple_crtc *crtc,
 	      struct apple_connector *connector)
 {
