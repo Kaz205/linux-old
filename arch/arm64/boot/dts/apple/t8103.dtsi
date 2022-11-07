@@ -63,7 +63,7 @@
 			enable-method = "spin-table";
 			cpu-release-addr = <0 0>; /* To be filled by loader */
 			operating-points-v2 = <&ecluster_opp>;
-			capacity-dmips-mhz = <714>;
+			capacity-dmips-mhz = <512>;
 			performance-domains = <&cpufreq_e>;
 		};
 
@@ -74,7 +74,7 @@
 			enable-method = "spin-table";
 			cpu-release-addr = <0 0>; /* To be filled by loader */
 			operating-points-v2 = <&ecluster_opp>;
-			capacity-dmips-mhz = <714>;
+			capacity-dmips-mhz = <512>;
 			performance-domains = <&cpufreq_e>;
 		};
 
@@ -85,7 +85,7 @@
 			enable-method = "spin-table";
 			cpu-release-addr = <0 0>; /* To be filled by loader */
 			operating-points-v2 = <&ecluster_opp>;
-			capacity-dmips-mhz = <714>;
+			capacity-dmips-mhz = <512>;
 			performance-domains = <&cpufreq_e>;
 		};
 
@@ -96,7 +96,7 @@
 			enable-method = "spin-table";
 			cpu-release-addr = <0 0>; /* To be filled by loader */
 			operating-points-v2 = <&ecluster_opp>;
-			capacity-dmips-mhz = <714>;
+			capacity-dmips-mhz = <512>;
 			performance-domains = <&cpufreq_e>;
 		};
 
