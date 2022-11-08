@@ -248,6 +248,29 @@ static inline void sg_unmark_end(struct scatterlist *sg)
 	sg->page_link &= ~SG_END;
 }
 
+#define SG_DMA_BUS_ADDRESS	(1 << 0)
+#define SG_DMA_USE_SWIOTLB	(1 << 1)
+
+#ifdef CONFIG_SWIOTLB
+static inline bool sg_is_dma_use_swiotlb(struct scatterlist *sg)
+{
+	return sg->dma_flags & SG_DMA_USE_SWIOTLB;
+}
+
+static inline void sg_dma_mark_use_swiotlb(struct scatterlist *sg)
+{
+	sg->dma_flags |= SG_DMA_USE_SWIOTLB;
+}
+#else
+static inline bool sg_is_dma_use_swiotlb(struct scatterlist *sg)
+{
+	return false;
+}
+static inline void sg_dma_mark_use_swiotlb(struct scatterlist *sg)
+{
+}
+#endif
+
 /*
  * CONFIG_PCI_P2PDMA depends on CONFIG_64BIT which means there is 4 bytes
  * in struct scatterlist (assuming also CONFIG_NEED_SG_DMA_LENGTH is set).
@@ -255,8 +278,6 @@ static inline void sg_unmark_end(struct scatterlist *sg)
  * dma address is a bus address.
  */
 #ifdef CONFIG_PCI_P2PDMA
-
-#define SG_DMA_BUS_ADDRESS (1 << 0)
 
 /**
  * sg_dma_is_bus address - Return whether a given segment was marked
