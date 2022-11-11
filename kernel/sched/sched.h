@@ -1822,7 +1822,7 @@ extern struct static_key_false sched_asym_cpucapacity;
 
 static __always_inline bool sched_asym_cpucap_active(void)
 {
-	return static_branch_unlikely(&sched_asym_cpucapacity);
+	return static_branch_likely(&sched_asym_cpucapacity);
 }
 
 struct sched_group_capacity {
