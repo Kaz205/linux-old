@@ -8862,7 +8862,7 @@ static void update_cpu_capacity(struct sched_domain *sd, int cpu)
 	 *   * Thermal pressure will impact all cpus in this perf domain
 	 *     equally.
 	 */
-	if (static_branch_unlikely(&sched_asym_cpucapacity)) {
+	if (static_branch_likely(&sched_asym_cpucapacity)) {
 		unsigned long inv_cap = capacity_orig - thermal_load_avg(rq);
 		struct perf_domain *pd = rcu_dereference(rq->rd->pd);
 
