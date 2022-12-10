@@ -2971,6 +2971,7 @@ static int __set_cpus_allowed_ptr(struct task_struct *p,
 {
 	struct rq_flags rf;
 	struct rq *rq;
+	const struct cpumask *new_mask = ctx->new_mask;
 
 	/* Don't allow perf-critical threads to have non-perf affinities */
 	if ((p->flags & PF_PERF_CRITICAL) && new_mask != cpu_lp_mask &&
