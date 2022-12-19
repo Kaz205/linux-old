@@ -461,6 +461,13 @@ config MTD_NAND_PL35X
 	  Enables support for PrimeCell SMC PL351 and PL353 NAND
 	  controller found on Zynq7000.
 
+config MTD_NAND_CELESTIAL_CNC1800L
+	tristate "Celestial CNC1800L NAND"
+	depends on MACH_CELESTIAL || COMPILE_TEST
+	default y
+	help
+	  Support for NAND flash on Celestial CNC1800L.
+
 comment "Misc"
 
 config MTD_SM_COMMON

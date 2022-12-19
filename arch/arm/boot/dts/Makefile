@@ -5,6 +5,8 @@ dtb-$(CONFIG_MACH_ARTPEC6) += \
 	artpec6-devboard.dtb
 dtb-$(CONFIG_MACH_ASM9260) += \
 	alphascale-asm9260-devkit.dtb
+dtb-$(CONFIG_MACH_CELESTIAL) += \
+	celestial-cnc1800l.dtb
 # Keep at91 dtb files sorted alphabetically for each SoC
 dtb-$(CONFIG_SOC_AT91RM9200) += \
 	at91rm9200ek.dtb \

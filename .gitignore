@@ -49,6 +49,7 @@
 *.zst
 Module.symvers
 modules.order
+uImage
 
 #
 # Top-level generic files

@@ -257,6 +257,14 @@ config USB_EHCI_HCD_AT91
 	  Enables support for the on-chip EHCI controller on
 	  Atmel chips.
 
+config USB_EHCI_HCD_CNC1800L
+	bool  "Support for Celestial on-chip EHCI USB controller"
+	depends on USB_EHCI_HCD && (MACH_CELESTIAL || COMPILE_TEST)
+	default y if MACH_CELESTIAL
+	help
+	  Enables support for the on-chip EHCI controller on
+	  Celestial chips.
+
 config USB_EHCI_TEGRA
 	tristate "NVIDIA Tegra HCD support"
 	depends on ARCH_TEGRA
@@ -547,6 +555,14 @@ config USB_OHCI_HCD_SSB
 	  Broadcom based SSB bus.
 
 	  If unsure, say N.
+
+config USB_OHCI_HCD_CNC1800L
+	bool "Support for Celestial on-chip OHCI USB controller"
+	depends on USB_OHCI_HCD && (MACH_CELESTIAL || COMPILE_TEST) && OF
+	default y if MACH_CELESTIAL
+	help
+	  Enables support for the on-chip OHCI controller on
+	  Celestial chips.
 
 config USB_OHCI_SH
 	bool "OHCI support for SuperH USB controller (DEPRECATED)"

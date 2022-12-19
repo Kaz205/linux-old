@@ -211,6 +211,14 @@ config GPIO_CADENCE
 	help
 	  Say yes here to enable support for Cadence GPIO controller.
 
+config GPIO_CELESTIAL_CNC1800L
+	bool "CNC1800L GPIO"
+	depends on OF_GPIO && MACH_CELESTIAL
+	select GPIO_GENERIC
+	select GPIOLIB_IRQCHIP
+	help
+	  Say yes here to enable support for the CNC1800L platform GPIO.
+
 config GPIO_CLPS711X
 	tristate "CLPS711X GPIO support"
 	depends on ARCH_CLPS711X || COMPILE_TEST
