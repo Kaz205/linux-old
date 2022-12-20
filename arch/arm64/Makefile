@@ -37,6 +37,7 @@ $(warning Detected assembler with broken .inst; disassembly will be unreliable)
 endif
 
 KBUILD_CFLAGS	+= -mcpu=apple-m1
+KBUILD_RUSTFLAGS += -Ctarget-cpu=apple-m1
 
 KBUILD_CFLAGS	+= -mgeneral-regs-only	\
 		   $(compat_vdso) $(cc_has_k_constraint)
