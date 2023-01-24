@@ -1872,11 +1872,10 @@ DECLARE_PER_CPU(struct sched_domain_shared __rcu *, sd_llc_shared);
 DECLARE_PER_CPU(struct sched_domain __rcu *, sd_numa);
 DECLARE_PER_CPU(struct sched_domain __rcu *, sd_asym_packing);
 DECLARE_PER_CPU(struct sched_domain __rcu *, sd_asym_cpucapacity);
-extern struct static_key_false sched_asym_cpucapacity;
 
 static __always_inline bool sched_asym_cpucap_active(void)
 {
-	return static_branch_unlikely(&sched_asym_cpucapacity);
+	return true;
 }
 
 struct sched_group_capacity {
