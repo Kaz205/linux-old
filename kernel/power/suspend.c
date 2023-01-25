@@ -423,33 +423,33 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 	if (suspend_test(TEST_PLATFORM))
 		goto Platform_wake;
 
+	error = syscore_suspend();
+	if (!error)
+		goto Platform_wake;
+
 	if (state == PM_SUSPEND_TO_IDLE) {
 		s2idle_loop();
 		goto Platform_wake;
 	}
-
-	error = pm_sleep_disable_secondary_cpus();
-	if (error || suspend_test(TEST_CPUS))
-		goto Enable_cpus;
 
 	arch_suspend_disable_irqs();
 	BUG_ON(!irqs_disabled());
 
 	system_state = SYSTEM_SUSPEND;
 
-	error = syscore_suspend();
-	if (!error) {
-		*wakeup = pm_wakeup_pending();
-		if (!(suspend_test(TEST_CORE) || *wakeup)) {
-			trace_suspend_resume(TPS("machine_suspend"),
-				state, true);
-			error = suspend_ops->enter(state);
-			trace_suspend_resume(TPS("machine_suspend"),
-				state, false);
-		} else if (*wakeup) {
-			error = -EBUSY;
-		}
-		syscore_resume();
+	error = pm_sleep_disable_secondary_cpus();
+	if (error || suspend_test(TEST_CPUS))
+		goto Enable_cpus;
+
+	*wakeup = pm_wakeup_pending();
+	if (!(suspend_test(TEST_CORE) || *wakeup)) {
+		trace_suspend_resume(TPS("machine_suspend"),
+			state, true);
+		error = suspend_ops->enter(state);
+		trace_suspend_resume(TPS("machine_suspend"),
+			state, false);
+	} else if (*wakeup) {
+		error = -EBUSY;
 	}
 
 	system_state = SYSTEM_RUNNING;
@@ -461,6 +461,7 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 	pm_sleep_enable_secondary_cpus();
 
  Platform_wake:
+	syscore_resume();
 	platform_resume_noirq(state);
 	dpm_resume_noirq(PMSG_RESUME);
 
