@@ -17,6 +17,7 @@
 #include <linux/sched_clock.h>
 #include <linux/seqlock.h>
 #include <linux/bitops.h>
+#include <linux/suspend.h>
 
 #include "timekeeping.h"
 
@@ -282,15 +283,33 @@ void sched_clock_resume(void)
 	rd->read_sched_clock = cd.actual_read_sched_clock;
 }
 
-static struct syscore_ops sched_clock_ops = {
-	.suspend	= sched_clock_suspend,
-	.resume		= sched_clock_resume,
-};
-
-static int __init sched_clock_syscore_init(void)
+static int
+sched_clock_pm_callback(struct notifier_block *nb,
+			 unsigned long action, void *ptr)
 {
-	register_syscore_ops(&sched_clock_ops);
+	switch (action) {
+	case PM_SUSPEND_PREPARE:
+	case PM_HIBERNATION_PREPARE:
+		sched_clock_suspend();
+		break;
 
+	case PM_POST_SUSPEND:
+	case PM_POST_HIBERNATION:
+		sched_clock_resume();
+		break;
+
+	default:
+		return NOTIFY_DONE;
+	}
+
+	return NOTIFY_OK;
+}
+
+
+static int __init sched_clock_pm_sync_init(void)
+{
+	/* Pause CLOCK_MONOTONIC on suspend */
+	pm_notifier(sched_clock_pm_callback, 0);
 	return 0;
 }
-device_initcall(sched_clock_syscore_init);
+core_initcall(sched_clock_pm_sync_init);
