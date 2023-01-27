@@ -139,11 +139,6 @@ int cpuidle_find_deepest_state(struct cpuidle_driver *drv,
 static void enter_s2idle_proper(struct cpuidle_driver *drv,
 				struct cpuidle_device *dev, int index)
 {
-	ktime_t time_start, time_end;
-	struct cpuidle_state *target_state = &drv->states[index];
-
-	time_start = ns_to_ktime(local_clock());
-
 	tick_freeze();
 	/*
 	 * The state used here cannot be a "coupled" one, because the "coupled"
@@ -151,20 +146,13 @@ static void enter_s2idle_proper(struct cpuidle_driver *drv,
 	 * suspended is generally unsafe.
 	 */
 	stop_critical_timings();
-	if (!(target_state->flags & CPUIDLE_FLAG_RCU_IDLE))
-		ct_idle_enter();
-	target_state->enter_s2idle(dev, drv, index);
+	ct_idle_enter();
+	cpu_do_idle();
 	if (WARN_ON_ONCE(!irqs_disabled()))
 		local_irq_disable();
-	if (!(target_state->flags & CPUIDLE_FLAG_RCU_IDLE))
-		ct_idle_exit();
+	ct_idle_exit();
 	tick_unfreeze();
 	start_critical_timings();
-
-	time_end = ns_to_ktime(local_clock());
-
-	dev->states_usage[index].s2idle_time += ktime_us_delta(time_end, time_start);
-	dev->states_usage[index].s2idle_usage++;
 }
 
 /**
@@ -184,11 +172,8 @@ int cpuidle_enter_s2idle(struct cpuidle_driver *drv, struct cpuidle_device *dev)
 	 * that interrupts won't be enabled when it exits and allows the tick to
 	 * be frozen safely.
 	 */
-	index = find_deepest_state(drv, dev, U64_MAX, 0, true);
-	if (index > 0) {
-		enter_s2idle_proper(drv, dev, index);
-		local_irq_enable();
-	}
+	enter_s2idle_proper(drv, dev, index);
+	local_irq_enable();
 	return index;
 }
 #endif /* CONFIG_SUSPEND */

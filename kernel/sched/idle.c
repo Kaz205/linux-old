@@ -179,13 +179,6 @@ static void cpuidle_idle_call(void)
 		return;
 	}
 
-	if (cpuidle_not_available(drv, dev)) {
-		tick_nohz_idle_stop_tick();
-
-		default_idle_call();
-		goto exit_idle;
-	}
-
 	/*
 	 * Suspend-to-idle ("s2idle") is a system state in which all user space
 	 * has been frozen, all I/O devices have been suspended and the only
@@ -216,6 +209,13 @@ static void cpuidle_idle_call(void)
 		call_cpuidle(drv, dev, next_state);
 	} else {
 		bool stop_tick = true;
+
+		if (cpuidle_not_available(drv, dev)) {
+			tick_nohz_idle_stop_tick();
+
+			default_idle_call();
+			goto exit_idle;
+		}
 
 		/*
 		 * Ask the cpuidle framework to choose a convenient idle state.
