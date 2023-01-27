@@ -54,7 +54,6 @@ static struct cpuidle_driver arm_idle_driver __initdata = {
 	 */
 	.states[0] = {
 		.enter                  = arm_enter_idle_state,
-		.enter_s2idle		= arm_enter_idle_state,
 		.exit_latency           = 1,
 		.target_residency       = 1,
 		.power_usage		= UINT_MAX,
