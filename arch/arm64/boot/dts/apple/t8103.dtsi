@@ -72,6 +72,7 @@
 			next-level-cache = <&l2_cache_0>;
 			i-cache-size = <0x20000>;
 			d-cache-size = <0x10000>;
+			arm,idle-state;
 		};
 
 		cpu_e1: cpu@1 {
@@ -86,6 +87,7 @@
 			next-level-cache = <&l2_cache_0>;
 			i-cache-size = <0x20000>;
 			d-cache-size = <0x10000>;
+			arm,idle-state;
 		};
 
 		cpu_e2: cpu@2 {
@@ -100,6 +102,7 @@
 			next-level-cache = <&l2_cache_0>;
 			i-cache-size = <0x20000>;
 			d-cache-size = <0x10000>;
+			arm,idle-state;
 		};
 
 		cpu_e3: cpu@3 {
@@ -114,6 +117,7 @@
 			next-level-cache = <&l2_cache_0>;
 			i-cache-size = <0x20000>;
 			d-cache-size = <0x10000>;
+			arm,idle-state;
 		};
 
 		cpu_p0: cpu@10100 {
@@ -128,6 +132,7 @@
 			next-level-cache = <&l2_cache_1>;
 			i-cache-size = <0x30000>;
 			d-cache-size = <0x20000>;
+			arm,idle-state;
 		};
 
 		cpu_p1: cpu@10101 {
@@ -142,6 +147,7 @@
 			next-level-cache = <&l2_cache_1>;
 			i-cache-size = <0x30000>;
 			d-cache-size = <0x20000>;
+			arm,idle-state;
 		};
 
 		cpu_p2: cpu@10102 {
@@ -156,6 +162,7 @@
 			next-level-cache = <&l2_cache_1>;
 			i-cache-size = <0x30000>;
 			d-cache-size = <0x20000>;
+			arm,idle-state;
 		};
 
 		cpu_p3: cpu@10103 {
@@ -170,6 +177,7 @@
 			next-level-cache = <&l2_cache_1>;
 			i-cache-size = <0x30000>;
 			d-cache-size = <0x20000>;
+			arm,idle-state;
 		};
 
 		l2_cache_0: l2-cache-0 {
