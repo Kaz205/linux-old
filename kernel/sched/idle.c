@@ -125,13 +125,12 @@ void __cpuidle default_idle_call(void)
 	}
 }
 
-static int call_cpuidle_s2idle(struct cpuidle_driver *drv,
-			       struct cpuidle_device *dev)
+static int call_cpuidle_s2idle(void)
 {
 	if (current_clr_polling_and_test())
 		return -EBUSY;
 
-	return cpuidle_enter_s2idle(drv, dev);
+	return cpuidle_enter_s2idle();
 }
 
 static int call_cpuidle(struct cpuidle_driver *drv, struct cpuidle_device *dev,
@@ -194,7 +193,7 @@ static void cpuidle_idle_call(void)
 
 		if (idle_should_enter_s2idle()) {
 
-			entered_state = call_cpuidle_s2idle(drv, dev);
+			entered_state = call_cpuidle_s2idle();
 			if (entered_state > 0)
 				goto exit_idle;
 

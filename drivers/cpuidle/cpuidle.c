@@ -136,8 +136,7 @@ int cpuidle_find_deepest_state(struct cpuidle_driver *drv,
 }
 
 #ifdef CONFIG_SUSPEND
-static void enter_s2idle_proper(struct cpuidle_driver *drv,
-				struct cpuidle_device *dev, int index)
+static void enter_s2idle_proper(void)
 {
 	tick_freeze();
 	/*
@@ -163,7 +162,7 @@ static void enter_s2idle_proper(struct cpuidle_driver *drv,
  * If there are states with the ->enter_s2idle callback, find the deepest of
  * them and enter it with frozen tick.
  */
-int cpuidle_enter_s2idle(struct cpuidle_driver *drv, struct cpuidle_device *dev)
+int cpuidle_enter_s2idle(void)
 {
 	int index;
 
@@ -172,7 +171,7 @@ int cpuidle_enter_s2idle(struct cpuidle_driver *drv, struct cpuidle_device *dev)
 	 * that interrupts won't be enabled when it exits and allows the tick to
 	 * be frozen safely.
 	 */
-	enter_s2idle_proper(drv, dev, index);
+	enter_s2idle_proper();
 	local_irq_enable();
 	return index;
 }
