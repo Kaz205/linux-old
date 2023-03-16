@@ -48,11 +48,9 @@ void disable_cpuidle(void)
 	off = 1;
 }
 
-bool cpuidle_not_available(void)
+bool cpuidle_not_available(struct cpuidle_driver *drv,
+			   struct cpuidle_device *dev)
 {
-	struct cpuidle_device *dev = cpuidle_get_device();
-	struct cpuidle_driver *drv = cpuidle_get_cpu_driver(dev);
-
 	return off || !initialized || !drv || !dev || !dev->enabled;
 }
 
