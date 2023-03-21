@@ -102,11 +102,6 @@ if ! test -e include/config/auto.conf; then
 	exit 1
 fi
 
-if [ -z "${KERNELVERSION}" ]; then
-	echo "KERNELVERSION is not set" >&2
-	exit 1
-fi
-
 # localversion* files in the build and source directory
 res="$(collect_files localversion*)"
 if test ! "$srctree" -ef .; then
@@ -132,4 +127,4 @@ elif [ "${LOCALVERSION+set}" != "set" ]; then
 	res="$res$(scm_version --short)"
 fi
 
-echo "${KERNELVERSION}${res}"
+echo "$res"
