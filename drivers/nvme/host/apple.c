@@ -205,7 +205,7 @@ struct apple_nvme {
 	struct delayed_work flush_dwork;
 };
 
-unsigned int flush_interval = 1000;
+unsigned int flush_interval = 5000;
 module_param(flush_interval, uint, 0644);
 MODULE_PARM_DESC(flush_interval, "Grace period in msecs between flushes");
 
