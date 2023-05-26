@@ -251,7 +251,7 @@ static inline void sg_unmark_end(struct scatterlist *sg)
 #define SG_DMA_BUS_ADDRESS	(1 << 0)
 #define SG_DMA_USE_SWIOTLB	(1 << 1)
 
-#ifdef CONFIG_SWIOTLB
+#if defined(CONFIG_IOMMU_DMA) && defined(CONFIG_SWIOTLB)
 static inline bool sg_is_dma_use_swiotlb(struct scatterlist *sg)
 {
 	return sg->dma_flags & SG_DMA_USE_SWIOTLB;
