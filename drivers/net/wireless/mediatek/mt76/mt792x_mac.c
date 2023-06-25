@@ -80,6 +80,7 @@ void mt792x_mac_update_mib_stats(struct mt792x_phy *phy)
 	struct mt792x_dev *dev = phy->dev;
 	int i, aggr0 = 0, aggr1;
 	u32 val;
+	return;
 
 	mib->fcs_err_cnt += mt76_get_field(dev, MT_MIB_SDR3(0),
 					   MT_MIB_SDR3_FCS_ERR_MASK);
