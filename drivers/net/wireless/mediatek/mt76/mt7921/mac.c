@@ -957,6 +957,7 @@ void mt7921_mac_update_mib_stats(struct mt7921_phy *phy)
 	int i, aggr0 = 0, aggr1;
 	u32 val;
 
+	return;
 	mib->fcs_err_cnt += mt76_get_field(dev, MT_MIB_SDR3(0),
 					   MT_MIB_SDR3_FCS_ERR_MASK);
 	mib->ack_fail_cnt += mt76_get_field(dev, MT_MIB_MB_BSDR3(0),
