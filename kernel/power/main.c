@@ -174,6 +174,8 @@ static ssize_t mem_sleep_show(struct kobject *kobj, struct kobj_attribute *attr,
 	for (i = PM_SUSPEND_MIN; i < PM_SUSPEND_MAX; i++) {
 		if (i >= PM_SUSPEND_MEM && cxl_mem_active())
 			continue;
+		if (i == PM_SUSPEND_TO_IDLE && cpuidle_not_available())
+			continue;
 		if (mem_sleep_states[i]) {
 			const char *label = mem_sleep_states[i];
 
@@ -226,11 +228,15 @@ static ssize_t mem_sleep_store(struct kobject *kobj, struct kobj_attribute *attr
 	}
 
 	state = decode_suspend_state(buf, n);
-	if (state < PM_SUSPEND_MAX && state > PM_SUSPEND_ON)
+	if (state == PM_SUSPEND_TO_IDLE && cpuidle_not_available())
+		goto err;
+	if (state < PM_SUSPEND_MAX && state > PM_SUSPEND_ON) {
 		mem_sleep_current = state;
-	else
-		error = -EINVAL;
+		goto out;
+	}
 
+ err:
+	error = -EINVAL;
  out:
 	pm_autosleep_unlock();
 	return error ? error : n;
