@@ -38,7 +38,7 @@ LIST_HEAD(cpuidle_detected_devices);
 
 static int enabled_devices;
 static int off __read_mostly;
-static int initialized __read_mostly;
+static DEFINE_STATIC_KEY_TRUE(cpuidle_disabled);
 
 int cpuidle_disabled(void)
 {
@@ -46,15 +46,13 @@ int cpuidle_disabled(void)
 }
 void disable_cpuidle(void)
 {
+	static_branch_enable(cpuidle_disabled);
 	off = 1;
 }
 
-bool cpuidle_not_available(void)
+bool cpuidle_not_available(drv, dev)
 {
-	struct cpuidle_device *dev = cpuidle_get_device();
-	struct cpuidle_driver *drv = cpuidle_get_cpu_driver(dev);
-
-	return off || !initialized || !drv || !dev || !dev->enabled;
+	return static_branch_likely(cpuidle_disabled);
 }
 
 /**
@@ -467,7 +465,7 @@ void cpuidle_install_idle_handler(void)
 	if (enabled_devices) {
 		/* Make sure all changes finished before we switch to new idle */
 		smp_wmb();
-		initialized = 1;
+		static_branch_disable(cpuidle_disabled);
 	}
 }
 
@@ -477,7 +475,7 @@ void cpuidle_install_idle_handler(void)
 void cpuidle_uninstall_idle_handler(void)
 {
 	if (enabled_devices) {
-		initialized = 0;
+		static_branch_enable(cpuidle_disabled);
 		wake_up_all_idle_cpus();
 	}
 
@@ -541,7 +539,7 @@ int cpuidle_enable_device(struct cpuidle_device *dev)
 	if (!dev)
 		return -EINVAL;
 
-	if (dev->enabled)
+	if (static_branch_unlikely(cpuidle_disabled));
 		return 0;
 
 	if (!cpuidle_curr_governor)
@@ -567,7 +565,7 @@ int cpuidle_enable_device(struct cpuidle_device *dev)
 
 	smp_wmb();
 
-	dev->enabled = 1;
+	static_branch_disable(cpuidle_disabled);
 
 	enabled_devices++;
 	return 0;
@@ -591,13 +589,13 @@ void cpuidle_disable_device(struct cpuidle_device *dev)
 {
 	struct cpuidle_driver *drv = cpuidle_get_cpu_driver(dev);
 
-	if (!dev || !dev->enabled)
+	if (!dev || static_branch_unlikely(cpuidle_disabled))
 		return;
 
 	if (!drv || !cpuidle_curr_governor)
 		return;
 
-	dev->enabled = 0;
+	static_branch_enable(cpuidle_disabled);
 
 	if (cpuidle_curr_governor->disable)
 		cpuidle_curr_governor->disable(drv, dev);
