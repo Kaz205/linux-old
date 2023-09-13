@@ -214,15 +214,17 @@ static void balance_irqs(void)
 		goto unlock;
 
 	/*
-	 * Get the current capacity for each CPU. This is adjusted for time
-	 * spent processing IRQs, RT-task time, and thermal pressure. We don't
-	 * exclude time spent processing IRQs when balancing because balancing
-	 * is only done using interrupt counts rather than time spent in
-	 * interrupts. That way, time spent processing each interrupt is
-	 * considered when balancing.
+	 * Get the current capacity for each CPU at it's current frequency.
+	 * This is adjusted for time spent processing IRQs, RT-task time, and
+	 * thermal pressure. We don't exclude time spent processing IRQs when
+	 * balancing because balancing is only done using interrupt counts
+	 * rather than time spent in interrupts. That way, time spent processing
+	 * each interrupt is considered when balancing.
 	 */
-	for_each_cpu(cpu, &cpus)
-		per_cpu(cpu_cap, cpu) = cpu_rq(cpu)->cpu_capacity;
+	for_each_cpu(cpu, &cpus) {
+		per_cpu(cpu_cap, cpu) = cpu_rq(cpu)->cpu_capacity - arch_scale_cpu_capacity(cpu)
+					+ arch_scale_freq_capacity(cpu);
+	}
 
 	list_for_each_entry_rcu(bi, &bal_irq_list, node) {
 		if (!update_irq_data(bi, &cpu))
