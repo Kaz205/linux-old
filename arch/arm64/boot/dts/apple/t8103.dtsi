@@ -190,24 +190,6 @@
 	ecluster_opp: opp-table-0 {
 		compatible = "operating-points-v2";
 
-		opp01 {
-			opp-hz = /bits/ 64 <600000000>;
-			opp-level = <1>;
-			clock-latency-ns = <7500>;
-			opp-microwatt = <47296>;
-		};
-		opp02 {
-			opp-hz = /bits/ 64 <972000000>;
-			opp-level = <2>;
-			clock-latency-ns = <22000>;
-			opp-microwatt = <99715>;
-		};
-		opp03 {
-			opp-hz = /bits/ 64 <1332000000>;
-			opp-level = <3>;
-			clock-latency-ns = <27000>;
-			opp-microwatt = <188860>;
-		};
 		opp04 {
 			opp-hz = /bits/ 64 <1704000000>;
 			opp-level = <4>;
