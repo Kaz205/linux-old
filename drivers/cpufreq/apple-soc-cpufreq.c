@@ -132,7 +132,7 @@ static unsigned int apple_soc_cpufreq_get_rate(unsigned int cpu)
 
 	dev_err(priv->cpu_dev, "could not find frequency for pstate %d\n",
 		pstate);
-	return 0;
+	return p->frequency;
 }
 
 static int apple_soc_cpufreq_set_target(struct cpufreq_policy *policy,
