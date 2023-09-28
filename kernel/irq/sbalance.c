@@ -27,6 +27,7 @@
 
 #define pr_fmt(fmt) "sbalance: " fmt
 
+#include <linux/sched/cputime.h>
 #include <linux/freezer.h>
 #include <linux/irq.h>
 #include <linux/list_sort.h>
@@ -347,7 +348,8 @@ static int __noreturn sbalance_thread(void *data)
 
 	set_freezable();
 	while (1) {
-		freezable_schedule_timeout_interruptible(poll_jiffies);
+		__set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
+		schedule_timeout(poll_jiffies);
 		balance_irqs();
 	}
 }
