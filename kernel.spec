@@ -105,16 +105,16 @@ The kernel-%{flaver} meta package
 %package core
 Summary: Kernel core package
 Group: System Environment/Kernel
-Provides: installonlypkg(kernel)
-Provides: kernel = %{rpmver}
-Provides: kernel-core = %{rpmver}
-Provides: kernel-core-uname-r = %{kverstr}
-Provides: kernel-uname-r = %{kverstr}
-Provides: kernel-%{_arch} = %{rpmver}
-Provides: kernel-core%{_isa} = %{rpmver}
-Provides: kernel-core-%{rpmver} = %{kverstr}
+Provides: installonlypkg(kernel-16k)
+Provides: kernel-16k = %{rpmver}
+Provides: kernel-16k-core = %{rpmver}
+Provides: kernel-16k-core-uname-r = %{kverstr}
+Provides: kernel-16k-uname-r = %{kverstr}
+Provides: kernel-16k-%{_arch} = %{rpmver}
+Provides: kernel-16k-core%{_isa} = %{rpmver}
+Provides: kernel-16k-core-%{rpmver} = %{kverstr}
 Provides: %{name}-core-%{rpmver} = %{kverstr}
-Provides:  kernel-drm-nouveau = 16
+Provides:  kernel-16k-drm-nouveau = 16
 # multiver
 Provides: %{name}%{_basekver}-core = %{rpmver}
 Requires: bash
@@ -122,7 +122,7 @@ Requires: coreutils
 Requires: dracut
 Requires: linux-firmware
 Requires: /usr/bin/kernel-install
-Requires: kernel-modules-%{rpmver} = %{kverstr}
+Requires: kernel-16k-modules-%{rpmver} = %{kverstr}
 Supplements: %{name} = %{rpmver}
 %description core
 The kernel package contains the Linux kernel (vmlinuz), the core of any
@@ -133,13 +133,13 @@ input and output, etc.
 %package modules
 Summary: Kernel modules to match the core kernel
 Group: System Environment/Kernel
-Provides: installonlypkg(kernel-module)
+Provides: installonlypkg(kernel-16k-module)
 Provides: %{name}%{_basekver}-modules = %{rpmver}
-Provides: kernel-modules = %{rpmver}
-Provides: kernel-modules%{_isa} = %{rpmver}
-Provides: kernel-modules-uname-r = %{kverstr}
-Provides: kernel-modules-%{_arch} = %{rpmver}
-Provides: kernel-modules-%{rpmver} = %{kverstr}
+Provides: kernel-16k-modules = %{rpmver}
+Provides: kernel-16k-modules%{_isa} = %{rpmver}
+Provides: kernel-16k-modules-uname-r = %{kverstr}
+Provides: kernel-16k-modules-%{_arch} = %{rpmver}
+Provides: kernel-16k-modules-%{rpmver} = %{kverstr}
 Provides: %{name}-modules-%{rpmver} = %{kverstr}
 Supplements: %{name} = %{rpmver}
 %description modules
@@ -148,9 +148,9 @@ This package provides kernel modules for the core %{?flavor:%{flavor}} kernel pa
 %package headers
 Summary: Header files for the Linux kernel for use by glibc
 Group: Development/System
-Provides: kernel-headers = %{kverstr}
+Provides: kernel-16k-headers = %{kverstr}
 Provides: glibc-kernheaders = 3.0-46
-Provides: kernel-headers%{_isa} = %{kverstr}
+Provides: kernel-16k-headers%{_isa} = %{kverstr}
 Obsoletes: kernel-headers < %{kverstr}
 Obsoletes: glibc-kernheaders < 3.0-46
 %description headers
@@ -179,12 +179,12 @@ Requires: lld
 %endif
 Enhances: akmods
 Enhances: dkms
-Provides: installonlypkg(kernel)
-Provides: kernel-devel = %{rpmver}
-Provides: kernel-devel-uname-r = %{kverstr}
-Provides: kernel-devel-%{_arch} = %{rpmver}
-Provides: kernel-devel%{_isa} = %{rpmver}
-Provides: kernel-devel-%{rpmver} = %{kverstr}
+Provides: installonlypkg(kernel-16k)
+Provides: kernel-16k-devel = %{rpmver}
+Provides: kernel-16k-devel-uname-r = %{kverstr}
+Provides: kernel-16k-devel-%{_arch} = %{rpmver}
+Provides: kernel-16k-devel%{_isa} = %{rpmver}
+Provides: kernel-16k-devel-%{rpmver} = %{kverstr}
 Provides: %{name}-devel-%{rpmver} = %{kverstr}
 Provides: %{name}%{_basekver}-devel = %{rpmver}
 %description devel
@@ -193,10 +193,10 @@ against the %{?flavor:%{flavor}} kernel package.
 
 %package devel-matched
 Summary: Meta package to install matching core and devel packages for a given %{?flavor:%{flavor}} kernel
-Requires: %{name}-devel = %{rpmver},
-Requires: %{name}-core = %{rpmver}
-Provides: kernel-devel-matched = %{rpmver}
-Provides: kernel-devel-matched%{_isa} = %{rpmver}
+Requires: %{name}-16k-devel = %{rpmver},
+Requires: %{name}-16k-core = %{rpmver}
+Provides: kernel-16k-devel-matched = %{rpmver}
+Provides: kernel-16k-devel-matched%{_isa} = %{rpmver}
 %description devel-matched
 This meta package is used to install matching core and devel packages for a given %{?flavor:%{flavor}} kernel.
 
