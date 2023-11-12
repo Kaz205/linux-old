@@ -1494,7 +1494,7 @@ struct macaudio_platform_cfg macaudio_j274_cfg = {
 };
 
 struct macaudio_platform_cfg macaudio_j293_cfg = {
-	false,	AMP_TAS5770,	SPKR_2W,	true,	15,	-20,
+	true,	AMP_TAS5770,	SPKR_2W,	true,	15,	-20,
 };
 
 struct macaudio_platform_cfg macaudio_j313_cfg = {
