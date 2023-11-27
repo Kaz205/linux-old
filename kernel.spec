@@ -89,7 +89,7 @@ BuildRequires: rsync
 BuildRequires: grubby
 BuildRequires: wget 
 BuildRequires: gcc
-BuildRequires: rust = 1.72.1, rust-src = 1.72.1, bindgen-cli, rustfmt = 1.72.1, lz4, dtc
+BuildRequires: rust, rust-src, bindgen-cli, rustfmt, lz4, dtc
 %if %{llvm_kbuild}
 BuildRequires: llvm
 BuildRequires: clang
@@ -202,13 +202,13 @@ This meta package is used to install matching core and devel packages for a give
 
 %prep
 {{{ git_dir_setup_macro }}}
-wget https://mirrors.edge.kernel.org/pub/tools/llvm/files/llvm-16.0.6-aarch64.tar.gz
-tar -xzf llvm-16.0.6-aarch64.tar.gz
+wget https://mirrors.edge.kernel.org/pub/tools/llvm/files/llvm-17.0.4-aarch64.tar.gz
+tar -xzf llvm-17.0.4-aarch64.tar.gz
 
 %build
 export LLVM=1
 # Use fast LLVM
-export PATH=$PWD/llvm-16.0.6-aarch64/bin:$PATH
+export PATH=$PWD/llvm-17.0.4-aarch64/bin:$PATH
 
 make asahi_defconfig 
 make %{?_smp_mflags} EXTRAVERSION=-%{krelstr}
