@@ -1099,7 +1099,7 @@ static int macaudio_add_pin_routes(struct snd_soc_card *card, struct snd_soc_com
 		if (component->name_prefix) {
 			snprintf(buf, sizeof(buf) - 1, "%s OUT", component->name_prefix);
 			r->source = buf;
-		}	
+		}
 		r->sink = "Speaker";
 	} else {
 		r = &routes[nroutes++];
@@ -1162,20 +1162,25 @@ static int macaudio_late_probe(struct snd_soc_card *card)
 	return 0;
 }
 
-#define CHECK(call, pattern, value) \
-	{ \
-		int ret = call(card, pattern, value); \
-		if (ret < 1 && (please_blow_up_my_speakers < 2)) { \
-			dev_err(card->dev, "%s on '%s': %d\n", #call, pattern, ret); \
-			return ret; \
-		} \
-		dev_dbg(card->dev, "%s on '%s': %d hits\n", #call, pattern, ret); \
+#define CHECK(call, pattern, value, min)                                       \
+	{                                                                      \
+		int ret = call(card, pattern, value);                          \
+		int err = (ret >= 0 && ret < min) ? -ERANGE : ret;             \
+		if (err < 0) {                                                 \
+			dev_err(card->dev, "%s on '%s': %d\n", #call, pattern, \
+				ret);                                          \
+			if (please_blow_up_my_speakers < 2)                    \
+				return err;                                    \
+		} else {                                                       \
+			dev_dbg(card->dev, "%s on '%s': %d hits\n", #call,     \
+				pattern, ret);                                 \
+		}                                                              \
 	}
 
 #define CHECK_CONCAT(call, suffix, value) \
 	{ \
 		snprintf(buf, sizeof(buf), "%s%s", prefix, suffix); \
-		CHECK(call, buf, value); \
+		CHECK(call, buf, value, 1); \
 	}
 
 static int macaudio_set_speaker(struct snd_soc_card *card, const char *prefix, bool tweeter)
@@ -1242,22 +1247,34 @@ static int macaudio_fixup_controls(struct snd_soc_card *card)
 	if (!ma->has_speakers)
 		return 0;
 
+	/*
+	 * This needs some care to avoid matches against cs42l84's
+	 * "Jack HPF Corner Frequency".
+	 */
 	switch(ma->cfg->speakers) {
 	case SPKR_NONE:
 		WARN_ON(please_blow_up_my_speakers < 2);
 		return please_blow_up_my_speakers >= 2 ? 0 : -EINVAL;
 	case SPKR_1W:
+		/* only 1W stereo system (J313) is uses cs42l83 */
+		if (ma->cfg->stereo) {
+			CHECK(macaudio_set_speaker, "* ", false, 0);
+		} else {
+			CHECK(macaudio_set_speaker, "", false, 0);
+		}
+		break;
 	case SPKR_2W:
-		CHECK(macaudio_set_speaker, "* ", false);
+		CHECK(macaudio_set_speaker, "* Front ", false, 0);
+		CHECK(macaudio_set_speaker, "* Rear ", false, 0);
 		break;
 	case SPKR_1W1T:
-		CHECK(macaudio_set_speaker, "* Tweeter ", true);
-		CHECK(macaudio_set_speaker, "* Woofer ", false);
+		CHECK(macaudio_set_speaker, "* Tweeter ", true, 0);
+		CHECK(macaudio_set_speaker, "* Woofer ", false, 0);
 		break;
 	case SPKR_2W1T:
-		CHECK(macaudio_set_speaker, "* Tweeter ", true);
-		CHECK(macaudio_set_speaker, "* Woofer 1 ", false);
-		CHECK(macaudio_set_speaker, "* Woofer 2 ", false);
+		CHECK(macaudio_set_speaker, "* Tweeter ", true, 0);
+		CHECK(macaudio_set_speaker, "* Woofer 1 ", false, 0);
+		CHECK(macaudio_set_speaker, "* Woofer 2 ", false, 0);
 		break;
 	}
 
@@ -1465,7 +1482,7 @@ static const struct snd_soc_dapm_route macaudio_dapm_routes[] = {
 	{ "PCM0 RX", NULL, "Headset Capture" },
 
 	/* Sense paths */
-	{ "PCM2 RX", NULL, "Speaker Sense Capture" },	
+	{ "PCM2 RX", NULL, "Speaker Sense Capture" },
 };
 
 /*	enable	amp		speakers	stereo	gain	safe_vol */
@@ -1473,7 +1490,7 @@ struct macaudio_platform_cfg macaudio_j180_cfg = {
 	false,	AMP_SN012776,	SPKR_1W1T,	false,	10,	-20,
 };
 struct macaudio_platform_cfg macaudio_j274_cfg = {
-	true,	AMP_TAS5770,	SPKR_1W,	false,	20,	-20,
+	false,	AMP_TAS5770,	SPKR_1W,	false,	20,	-20,
 };
 
 struct macaudio_platform_cfg macaudio_j293_cfg = {
@@ -1481,7 +1498,7 @@ struct macaudio_platform_cfg macaudio_j293_cfg = {
 };
 
 struct macaudio_platform_cfg macaudio_j313_cfg = {
-	true,	AMP_TAS5770,	SPKR_1W,	true,	10,	-20,
+	false,	AMP_TAS5770,	SPKR_1W,	true,	10,	-20,
 };
 
 struct macaudio_platform_cfg macaudio_j314_j316_cfg = {

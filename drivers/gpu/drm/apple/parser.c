@@ -30,9 +30,9 @@ struct dcp_parse_tag {
 	bool last : 1;
 } __packed;
 
-static void *parse_bytes(struct dcp_parse_ctx *ctx, size_t count)
+static const void *parse_bytes(struct dcp_parse_ctx *ctx, size_t count)
 {
-	void *ptr = ctx->blob + ctx->pos;
+	const void *ptr = ctx->blob + ctx->pos;
 
 	if (ctx->pos + count > ctx->len)
 		return ERR_PTR(-EINVAL);
@@ -41,14 +41,14 @@ static void *parse_bytes(struct dcp_parse_ctx *ctx, size_t count)
 	return ptr;
 }
 
-static u32 *parse_u32(struct dcp_parse_ctx *ctx)
+static const u32 *parse_u32(struct dcp_parse_ctx *ctx)
 {
 	return parse_bytes(ctx, sizeof(u32));
 }
 
-static struct dcp_parse_tag *parse_tag(struct dcp_parse_ctx *ctx)
+static const struct dcp_parse_tag *parse_tag(struct dcp_parse_ctx *ctx)
 {
-	struct dcp_parse_tag *tag;
+	const struct dcp_parse_tag *tag;
 
 	/* Align to 32-bits */
 	ctx->pos = round_up(ctx->pos, 4);
@@ -64,10 +64,10 @@ static struct dcp_parse_tag *parse_tag(struct dcp_parse_ctx *ctx)
 	return tag;
 }
 
-static struct dcp_parse_tag *parse_tag_of_type(struct dcp_parse_ctx *ctx,
+static const struct dcp_parse_tag *parse_tag_of_type(struct dcp_parse_ctx *ctx,
 					       enum dcp_parse_type type)
 {
-	struct dcp_parse_tag *tag = parse_tag(ctx);
+	const struct dcp_parse_tag *tag = parse_tag(ctx);
 
 	if (IS_ERR(tag))
 		return tag;
@@ -80,7 +80,7 @@ static struct dcp_parse_tag *parse_tag_of_type(struct dcp_parse_ctx *ctx,
 
 static int skip(struct dcp_parse_ctx *handle)
 {
-	struct dcp_parse_tag *tag = parse_tag(handle);
+	const struct dcp_parse_tag *tag = parse_tag(handle);
 	int ret = 0;
 	int i;
 
@@ -132,7 +132,7 @@ static int skip_pair(struct dcp_parse_ctx *handle)
 
 static bool consume_string(struct dcp_parse_ctx *ctx, const char *specimen)
 {
-	struct dcp_parse_tag *tag;
+	const struct dcp_parse_tag *tag;
 	const char *key;
 	ctx->pos = round_up(ctx->pos, 4);
 
@@ -155,7 +155,7 @@ static bool consume_string(struct dcp_parse_ctx *ctx, const char *specimen)
 /* Caller must free the result */
 static char *parse_string(struct dcp_parse_ctx *handle)
 {
-	struct dcp_parse_tag *tag = parse_tag_of_type(handle, DCP_TYPE_STRING);
+	const struct dcp_parse_tag *tag = parse_tag_of_type(handle, DCP_TYPE_STRING);
 	const char *in;
 	char *out;
 
@@ -175,8 +175,8 @@ static char *parse_string(struct dcp_parse_ctx *handle)
 
 static int parse_int(struct dcp_parse_ctx *handle, s64 *value)
 {
-	void *tag = parse_tag_of_type(handle, DCP_TYPE_INT64);
-	s64 *in;
+	const void *tag = parse_tag_of_type(handle, DCP_TYPE_INT64);
+	const s64 *in;
 
 	if (IS_ERR(tag))
 		return PTR_ERR(tag);
@@ -192,7 +192,7 @@ static int parse_int(struct dcp_parse_ctx *handle, s64 *value)
 
 static int parse_bool(struct dcp_parse_ctx *handle, bool *b)
 {
-	struct dcp_parse_tag *tag = parse_tag_of_type(handle, DCP_TYPE_BOOL);
+	const struct dcp_parse_tag *tag = parse_tag_of_type(handle, DCP_TYPE_BOOL);
 
 	if (IS_ERR(tag))
 		return PTR_ERR(tag);
@@ -201,10 +201,10 @@ static int parse_bool(struct dcp_parse_ctx *handle, bool *b)
 	return 0;
 }
 
-static int parse_blob(struct dcp_parse_ctx *handle, size_t size, u8 **blob)
+static int parse_blob(struct dcp_parse_ctx *handle, size_t size, u8 const **blob)
 {
-	struct dcp_parse_tag *tag = parse_tag_of_type(handle, DCP_TYPE_BLOB);
-	u8 *out;
+	const struct dcp_parse_tag *tag = parse_tag_of_type(handle, DCP_TYPE_BLOB);
+	const u8 *out;
 
 	if (IS_ERR(tag))
 		return PTR_ERR(tag);
@@ -229,7 +229,7 @@ struct iterator {
 static int iterator_begin(struct dcp_parse_ctx *handle, struct iterator *it,
 			  bool dict)
 {
-	struct dcp_parse_tag *tag;
+	const struct dcp_parse_tag *tag;
 	enum dcp_parse_type type = dict ? DCP_TYPE_DICTIONARY : DCP_TYPE_ARRAY;
 
 	*it = (struct iterator) {
@@ -250,9 +250,9 @@ static int iterator_begin(struct dcp_parse_ctx *handle, struct iterator *it,
 #define dcp_parse_foreach_in_dict(handle, it)                                  \
 	for (iterator_begin(handle, &it, true); it.idx < it.len; ++it.idx)
 
-int parse(void *blob, size_t size, struct dcp_parse_ctx *ctx)
+int parse(const void *blob, size_t size, struct dcp_parse_ctx *ctx)
 {
-	u32 *header;
+	const u32 *header;
 
 	*ctx = (struct dcp_parse_ctx) {
 		.blob = blob,
@@ -313,14 +313,42 @@ struct color_mode {
 	s64 score;
 };
 
-static int parse_color_modes(struct dcp_parse_ctx *handle, s64 *preferred_id)
+static int fill_color_mode(struct dcp_color_mode *color,
+			   struct color_mode *cmode)
+{
+	if (color->score >= cmode->score)
+		return 0;
+
+	if (cmode->colorimetry < 0 || cmode->colorimetry >= DCP_COLORIMETRY_COUNT)
+		return -EINVAL;
+	if (cmode->depth < 8 || cmode->depth > 12)
+		return -EINVAL;
+	if (cmode->dynamic_range < 0 || cmode->dynamic_range >= DCP_COLOR_YCBCR_RANGE_COUNT)
+		return -EINVAL;
+	if (cmode->eotf < 0 || cmode->eotf >= DCP_EOTF_COUNT)
+		return -EINVAL;
+	if (cmode->pixel_encoding < 0 || cmode->pixel_encoding >= DCP_COLOR_FORMAT_COUNT)
+		return -EINVAL;
+
+	color->score = cmode->score;
+	color->id = cmode->id;
+	color->eotf = cmode->eotf;
+	color->format = cmode->pixel_encoding;
+	color->colorimetry = cmode->colorimetry;
+	color->range = cmode->dynamic_range;
+	color->depth = cmode->depth;
+
+	return 0;
+}
+
+static int parse_color_modes(struct dcp_parse_ctx *handle,
+			     struct dcp_display_mode *out)
 {
 	struct iterator outer_it;
 	int ret = 0;
-	s64 best_score = -1, best_score_sdr = -1;
-	s64 best_id = -1, best_id_sdr = -1;
-
-	*preferred_id = -1;
+	out->sdr_444.score = -1;
+	out->sdr_rgb.score = -1;
+	out->best.score = -1;
 
 	dcp_parse_foreach_in_array(handle, outer_it) {
 		struct iterator it;
@@ -367,24 +395,17 @@ static int parse_color_modes(struct dcp_parse_ctx *handle, s64 *preferred_id)
 				       cmode.eotf, cmode.dynamic_range,
 				       cmode.pixel_encoding);
 
-		if (cmode.eotf == 0) {
-			if (cmode.score > best_score_sdr) {
-				best_score_sdr = cmode.score;
-				best_id_sdr = cmode.id;
-			}
-		} else {
-			if (cmode.score > best_score) {
-				best_score = cmode.score;
-				best_id = cmode.id;
-			}
+		if (cmode.eotf == DCP_EOTF_SDR_GAMMA) {
+			if (cmode.pixel_encoding == DCP_COLOR_FORMAT_RGB &&
+				cmode.depth <= 10)
+				fill_color_mode(&out->sdr_rgb, &cmode);
+			else if (cmode.pixel_encoding == DCP_COLOR_FORMAT_YCBCR444 &&
+				cmode.depth <= 10)
+				fill_color_mode(&out->sdr_444, &cmode);
+			fill_color_mode(&out->sdr, &cmode);
 		}
+		fill_color_mode(&out->best, &cmode);
 	}
-
-	/* prefer SDR color modes as long as HDR is not supported */
-	if (best_score_sdr >= 0)
-		*preferred_id = best_id_sdr;
-	else if (best_score >= 0)
-		*preferred_id = best_id;
 
 	return 0;
 }
@@ -427,7 +448,7 @@ static int parse_mode(struct dcp_parse_ctx *handle,
 		else if (!strcmp(key, "VerticalAttributes"))
 			ret = parse_dimension(it.handle, &vert);
 		else if (!strcmp(key, "ColorModes"))
-			ret = parse_color_modes(it.handle, &best_color_mode);
+			ret = parse_color_modes(it.handle, out);
 		else if (!strcmp(key, "ID"))
 			ret = parse_int(it.handle, &id);
 		else if (!strcmp(key, "IsVirtual"))
@@ -445,8 +466,17 @@ static int parse_mode(struct dcp_parse_ctx *handle,
 			return ret;
 		}
 	}
+	if (out->sdr_rgb.score >= 0)
+		best_color_mode = out->sdr_rgb.id;
+	else if (out->sdr_444.score >= 0)
+		best_color_mode = out->sdr_444.id;
+	else if (out->sdr.score >= 0)
+		best_color_mode = out->sdr.id;
+	else if (out->best.score >= 0)
+		best_color_mode = out->best.id;
 
-	trace_iomfb_parse_mode_success(id, &horiz, &vert, best_color_mode, is_virtual, *score);
+	trace_iomfb_parse_mode_success(id, &horiz, &vert, best_color_mode,
+				       is_virtual, *score);
 
 	/*
 	 * Reject modes without valid color mode.
@@ -896,7 +926,7 @@ static int parse_mode_in_avep_element(struct dcp_parse_ctx *handle,
 					return ret;
 			}
 		} else if (consume_string(it.handle, "ElementData")) {
-			u8 *blob;
+			const u8 *blob;
 
 			ret = parse_blob(it.handle, sizeof(*cookie), &blob);
 			if (ret)
@@ -967,3 +997,51 @@ int parse_sound_mode(struct dcp_parse_ctx *handle,
 	return 0;
 }
 EXPORT_SYMBOL_GPL(parse_sound_mode);
+
+int parse_system_log_mnits(struct dcp_parse_ctx *handle, struct dcp_system_ev_mnits *entry)
+{
+	struct iterator it;
+	int ret;
+	s64 mnits = -1;
+	s64 idac = -1;
+	s64 timestamp = -1;
+	bool type_match = false;
+
+	dcp_parse_foreach_in_dict(handle, it) {
+		char *key = parse_string(it.handle);
+		if (IS_ERR(key)) {
+			ret = PTR_ERR(key);
+		} else if (!strcmp(key, "mNits")) {
+			ret = parse_int(it.handle, &mnits);
+		} else if (!strcmp(key, "iDAC")) {
+			ret = parse_int(it.handle, &idac);
+		} else if (!strcmp(key, "logEvent")) {
+			const char * value = parse_string(it.handle);
+			if (!IS_ERR_OR_NULL(value)) {
+				type_match = strcmp(value, "Display (Event Forward)") == 0;
+				kfree(value);
+			}
+		} else if (!strcmp(key, "timestamp")) {
+			ret = parse_int(it.handle, &timestamp);
+		} else {
+			skip(it.handle);
+		}
+
+		if (!IS_ERR_OR_NULL(key))
+			kfree(key);
+
+		if (ret) {
+			pr_err("dcp parser: failed to parse mNits sys event\n");
+			return ret;
+		}
+	}
+
+	if (!type_match ||  mnits < 0 || idac < 0 || timestamp < 0)
+		return -EINVAL;
+
+	entry->millinits = mnits;
+	entry->idac = idac;
+	entry->timestamp = timestamp;
+
+	return 0;
+}

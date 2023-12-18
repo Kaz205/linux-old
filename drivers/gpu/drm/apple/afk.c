@@ -445,21 +445,9 @@ static void afk_recv_handle_std_service(struct apple_dcp_afkep *ep, u32 channel,
 	}
 
 	if (type == EPIC_TYPE_NOTIFY && eshdr->category == EPIC_CAT_REPORT) {
-		struct epic_std_service_ap_call *call = payload;
-		size_t call_size;
-
-		if (payload_size < sizeof(*call))
-			return;
-
-		call_size = le32_to_cpu(call->len);
-		if (payload_size < sizeof(*call) + call_size)
-			return;
-
-		if (!service->ops->report)
-			return;
-
-		service->ops->report(service, le32_to_cpu(call->type),
-				     payload + sizeof(*call), call_size);
+		if (service->ops->report)
+			service->ops->report(service, le16_to_cpu(eshdr->type),
+					     payload, payload_size);
 		return;
 	}
 
@@ -503,6 +491,12 @@ static void afk_recv_handle(struct apple_dcp_afkep *ep, u32 channel, u32 type,
 			dev_err(ep->dcp->dev,
 				"AFK[ep:%02x]: expected report but got 0x%x on channel %d\n",
 				ep->endpoint, eshdr->category, channel);
+			return;
+		}
+		if (subtype == EPIC_SUBTYPE_TEARDOWN) {
+			dev_dbg(ep->dcp->dev,
+				"AFK[ep:%02x]: teardown without service on channel %d\n",
+				ep->endpoint, channel);
 			return;
 		}
 		if (subtype != EPIC_SUBTYPE_ANNOUNCE) {
