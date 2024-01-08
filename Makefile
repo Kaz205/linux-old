@@ -5,6 +5,9 @@ SUBLEVEL = 9
 EXTRAVERSION = -rc1
 NAME = Hurr durr I'ma ninja sloth
 
+LLVM=1
+ARCH=x86_64
+
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
 # More info can be located in ./README
