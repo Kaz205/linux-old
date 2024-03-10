@@ -599,7 +599,6 @@ static int __init hugepage_init_sysfs(struct kobject **hugepage_kobj)
 			goto remove_all;
 		}
 		list_add(&thpsize->node, &thpsize_list);
-		set_bit(order, &huge_anon_orders_inherit);
 		order = next_order(&orders, order);
 	}
 
