@@ -346,9 +346,15 @@ static int pstate_init_perf(struct amd_cpudata *cpudata)
 {
 	u64 cap1;
 	u32 highest_perf;
+	struct cppc_perf_caps cppc_perf;
+	int ret;
 
-	int ret = rdmsrl_safe_on_cpu(cpudata->cpu, MSR_AMD_CPPC_CAP1,
+	ret = rdmsrl_safe_on_cpu(cpudata->cpu, MSR_AMD_CPPC_CAP1,
 				     &cap1);
+	if (ret)
+		return ret;
+
+	ret = cppc_get_perf_caps(cpudata->cpu, &cppc_perf);
 	if (ret)
 		return ret;
 
@@ -369,6 +375,9 @@ static int pstate_init_perf(struct amd_cpudata *cpudata)
 	WRITE_ONCE(cpudata->lowest_perf, AMD_CPPC_LOWEST_PERF(cap1));
 	WRITE_ONCE(cpudata->prefcore_ranking, AMD_CPPC_HIGHEST_PERF(cap1));
 	WRITE_ONCE(cpudata->min_limit_perf, AMD_CPPC_LOWEST_PERF(cap1));
+	WRITE_ONCE(cpudata->lowest_freq, cppc_perf.lowest_freq);
+	WRITE_ONCE(cpudata->nominal_freq, cppc_perf.nominal_freq);
+
 	return 0;
 }
 
@@ -376,8 +385,9 @@ static int cppc_init_perf(struct amd_cpudata *cpudata)
 {
 	struct cppc_perf_caps cppc_perf;
 	u32 highest_perf;
+	int ret;
 
-	int ret = cppc_get_perf_caps(cpudata->cpu, &cppc_perf);
+	ret = cppc_get_perf_caps(cpudata->cpu, &cppc_perf);
 	if (ret)
 		return ret;
 
@@ -394,6 +404,8 @@ static int cppc_init_perf(struct amd_cpudata *cpudata)
 	WRITE_ONCE(cpudata->lowest_perf, cppc_perf.lowest_perf);
 	WRITE_ONCE(cpudata->prefcore_ranking, cppc_perf.highest_perf);
 	WRITE_ONCE(cpudata->min_limit_perf, cppc_perf.lowest_perf);
+	WRITE_ONCE(cpudata->lowest_freq, cppc_perf.lowest_freq);
+	WRITE_ONCE(cpudata->nominal_freq, cppc_perf.nominal_freq);
 
 	if (cppc_state == AMD_PSTATE_ACTIVE)
 		return 0;
@@ -658,17 +670,12 @@ static void amd_pstate_adjust_perf(unsigned int cpu,
 
 static int amd_get_min_freq(struct amd_cpudata *cpudata)
 {
-	struct cppc_perf_caps cppc_perf;
 	u32 lowest_freq;
-
-	int ret = cppc_get_perf_caps(cpudata->cpu, &cppc_perf);
-	if (ret)
-		return ret;
 
 	if (quirks && quirks->lowest_freq)
 		lowest_freq = quirks->lowest_freq;
 	else
-		lowest_freq = cppc_perf.lowest_freq;
+		lowest_freq = READ_ONCE(cpudata->lowest_freq);
 
 	/* Switch to khz */
 	return lowest_freq * 1000;
@@ -676,13 +683,8 @@ static int amd_get_min_freq(struct amd_cpudata *cpudata)
 
 static int amd_get_max_freq(struct amd_cpudata *cpudata)
 {
-	struct cppc_perf_caps cppc_perf;
 	u32 max_perf, max_freq, nominal_freq, nominal_perf;
 	u64 boost_ratio;
-
-	int ret = cppc_get_perf_caps(cpudata->cpu, &cppc_perf);
-	if (ret)
-		return ret;
 
 	nominal_freq = READ_ONCE(cpudata->nominal_freq);
 	nominal_perf = READ_ONCE(cpudata->nominal_perf);
@@ -699,36 +701,25 @@ static int amd_get_max_freq(struct amd_cpudata *cpudata)
 
 static int amd_get_nominal_freq(struct amd_cpudata *cpudata)
 {
-	struct cppc_perf_caps cppc_perf;
 	u32 nominal_freq;
-
-	int ret = cppc_get_perf_caps(cpudata->cpu, &cppc_perf);
-	if (ret)
-		return ret;
 
 	if (quirks && quirks->nominal_freq)
 		nominal_freq = quirks->nominal_freq;
 	else
-		nominal_freq = cppc_perf.nominal_freq;
+		nominal_freq = READ_ONCE(cpudata->nominal_freq);
 
 	return nominal_freq;
 }
 
 static int amd_get_lowest_nonlinear_freq(struct amd_cpudata *cpudata)
 {
-	struct cppc_perf_caps cppc_perf;
 	u32 lowest_nonlinear_freq, lowest_nonlinear_perf,
 	    nominal_freq, nominal_perf;
 	u64 lowest_nonlinear_ratio;
 
-	int ret = cppc_get_perf_caps(cpudata->cpu, &cppc_perf);
-	if (ret)
-		return ret;
-
 	nominal_freq = READ_ONCE(cpudata->nominal_freq);
 	nominal_perf = READ_ONCE(cpudata->nominal_perf);
-
-	lowest_nonlinear_perf = cppc_perf.lowest_nonlinear_perf;
+	lowest_nonlinear_perf = READ_ONCE(cpudata->lowest_nonlinear_perf);
 
 	lowest_nonlinear_ratio = div_u64(lowest_nonlinear_perf << SCHED_CAPACITY_SHIFT,
 					 nominal_perf);
