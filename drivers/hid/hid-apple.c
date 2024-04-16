@@ -44,7 +44,7 @@
 #define HID_COUNTRY_INTERNATIONAL_ISO	13
 #define APPLE_BATTERY_TIMEOUT_MS	60000
 
-static unsigned int fnmode = 3;
+static unsigned int fnmode = 2;
 module_param(fnmode, uint, 0644);
 MODULE_PARM_DESC(fnmode, "Mode of fn key on Apple keyboards (0 = disabled, "
 		"1 = fkeyslast, 2 = fkeysfirst, [3] = auto)");
