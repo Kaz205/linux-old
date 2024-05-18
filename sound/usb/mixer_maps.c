@@ -211,7 +211,7 @@ static const struct usbmix_name_map live24ext_map[] = {
 /* LineX FM Transmitter entry - needed to bypass controls bug */
 static const struct usbmix_name_map linex_map[] = {
 	/* 1: IT pcm */
-	/* 2: OT Speaker */ 
+	/* 2: OT Speaker */
 	{ 3, "Master" }, /* FU: master volume - left / right / mute */
 	{ 0 } /* terminator */
 };
@@ -656,6 +656,10 @@ static const struct usbmix_ctl_map usbmix_ctl_maps[] = {
 	},
 	{	/* MSI MAG X570S Torpedo Max */
 		.id = USB_ID(0x0db0, 0xa073),
+		.map = msi_mpg_x570s_carbon_max_wifi_alc4080_map,
+	},
+	{
+		.id = USB_ID(0x0db0, 0x3130),
 		.map = msi_mpg_x570s_carbon_max_wifi_alc4080_map,
 	},
 	{	/* MSI TRX40 */
