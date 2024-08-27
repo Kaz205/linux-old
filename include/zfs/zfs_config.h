@@ -182,6 +182,9 @@
 /* blkdev_put() accepts void* as arg 2 */
 /* #undef HAVE_BLKDEV_PUT_HOLDER */
 
+/* struct queue_limits has a features field */
+/* #undef HAVE_BLKDEV_QUEUE_LIMITS_FEATURES */
+
 /* blkdev_reread_part() exists */
 /* #undef HAVE_BLKDEV_REREAD_PART */
 
@@ -220,6 +223,9 @@
 
 /* blk_queue_discard() is available */
 /* #undef HAVE_BLK_QUEUE_DISCARD */
+
+/* backing_dev_info is available through queue gendisk */
+#define HAVE_BLK_QUEUE_DISK_BDI 1
 
 /* blk_queue_flag_clear() exists */
 #define HAVE_BLK_QUEUE_FLAG_CLEAR 1
@@ -693,6 +699,9 @@
 /* Define to 1 if you have the 'mlockall' function. */
 #define HAVE_MLOCKALL 1
 
+/* page_mapping() is available */
+/* #undef HAVE_MM_PAGE_MAPPING */
+
 /* page_size() is available */
 #define HAVE_MM_PAGE_SIZE 1
 
@@ -738,6 +747,9 @@
 /* posix_acl_valid() wants user namespace */
 #define HAVE_POSIX_ACL_VALID_WITH_NS 1
 
+/* proc_handler ctl_table arg is const */
+/* #undef HAVE_PROC_HANDLER_CTL_TABLE_CONST */
+
 /* proc_ops structure exists */
 #define HAVE_PROC_OPS_STRUCT 1
 
@@ -761,6 +773,9 @@
 
 /* register_shrinker is vararg */
 /* #undef HAVE_REGISTER_SHRINKER_VARARG */
+
+/* register_sysctl_sz exists */
+#define HAVE_REGISTER_SYSCTL_SZ 1
 
 /* register_sysctl_table exists */
 /* #undef HAVE_REGISTER_SYSCTL_TABLE */
@@ -1185,7 +1200,7 @@
 /* #undef ZFS_IS_GPL_COMPATIBLE */
 
 /* Define the project alias string. */
-#define ZFS_META_ALIAS "zfs-2.2.5-2_g863f8b3a9"
+#define ZFS_META_ALIAS "zfs-2.2.6-1"
 
 /* Define the project author. */
 #define ZFS_META_AUTHOR "OpenZFS"
@@ -1194,7 +1209,7 @@
 /* #undef ZFS_META_DATA */
 
 /* Define the maximum compatible kernel version. */
-#define ZFS_META_KVER_MAX "6.9"
+#define ZFS_META_KVER_MAX "6.10"
 
 /* Define the minimum compatible kernel version. */
 #define ZFS_META_KVER_MIN "3.10"
@@ -1215,10 +1230,10 @@
 #define ZFS_META_NAME "zfs"
 
 /* Define the project release. */
-#define ZFS_META_RELEASE "2_g863f8b3a9"
+#define ZFS_META_RELEASE "1"
 
 /* Define the project version. */
-#define ZFS_META_VERSION "2.2.5"
+#define ZFS_META_VERSION "2.2.6"
 
 /* count is located in percpu_ref.data */
 #define ZFS_PERCPU_REF_COUNT_IN_DATA 1

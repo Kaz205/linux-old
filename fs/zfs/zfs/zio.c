@@ -203,6 +203,10 @@ zio_init(void)
 
 		if (align != 0) {
 			char name[36];
+			if (abd_size_alloc_linear(size)) {
+				cflags |= KMC_RECLAIMABLE;
+				data_cflags |= KMC_RECLAIMABLE;
+			}
 			if (cflags == data_cflags) {
 				/*
 				 * Resulting kmem caches would be identical.

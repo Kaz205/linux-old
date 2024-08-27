@@ -186,7 +186,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/always-arch.m4 \
 	$(top_srcdir)/config/kernel-misc-minor.m4 \
 	$(top_srcdir)/config/kernel-mkdir.m4 \
 	$(top_srcdir)/config/kernel-mknod.m4 \
-	$(top_srcdir)/config/kernel-mm-page-size.m4 \
+	$(top_srcdir)/config/kernel-mm-pagemap.m4 \
 	$(top_srcdir)/config/kernel-objtool.m4 \
 	$(top_srcdir)/config/kernel-pagemap-folio_wait_bit.m4 \
 	$(top_srcdir)/config/kernel-pde-data.m4 \
@@ -744,10 +744,10 @@ OTOOL64 =
 PACKAGE = zfs
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = zfs
-PACKAGE_STRING = zfs 2.2.5
+PACKAGE_STRING = zfs 2.2.6
 PACKAGE_TARNAME = zfs
 PACKAGE_URL = 
-PACKAGE_VERSION = 2.2.5
+PACKAGE_VERSION = 2.2.6
 PARALLEL = 
 PATH_SEPARATOR = :
 PKG_CONFIG = /usr/bin/pkg-config
@@ -771,7 +771,7 @@ QAT_OBJ =
 QAT_SRC = 
 QAT_SYMBOLS = 
 RANLIB = ranlib
-RELEASE = 2_g863f8b3a9
+RELEASE = 1
 RM = rm -f
 RPM = rpm
 RPMBUILD = rpmbuild
@@ -799,25 +799,25 @@ UBSAN_LDFLAGS =
 UBSAN_ZFS = _without_ubsan
 USE_NLS = yes
 VENDOR = arch
-VERSION = 2.2.5
+VERSION = 2.2.6
 WITH_DEBUG = 
 WITH_INVARIANTS = 
 XGETTEXT = /usr/bin/xgettext
 XGETTEXT_015 = /usr/bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
 ZFS_CONFIG = all
-ZFS_META_ALIAS = zfs-2.2.5-2_g863f8b3a9
+ZFS_META_ALIAS = zfs-2.2.6-1
 ZFS_META_AUTHOR = OpenZFS
 ZFS_META_DATA = 
-ZFS_META_KVER_MAX = 6.9
+ZFS_META_KVER_MAX = 6.10
 ZFS_META_KVER_MIN = 3.10
 ZFS_META_LICENSE = CDDL
 ZFS_META_LT_AGE = 
 ZFS_META_LT_CURRENT = 
 ZFS_META_LT_REVISION = 
 ZFS_META_NAME = zfs
-ZFS_META_RELEASE = 2_g863f8b3a9
-ZFS_META_VERSION = 2.2.5
+ZFS_META_RELEASE = 1
+ZFS_META_VERSION = 2.2.6
 ZLIB_CFLAGS = 
 ZLIB_LIBS = -lz
 ZLIB_PC = zlib
