@@ -18,32 +18,29 @@
  *
  * CDDL HEADER END
  */
-
 /*
- * Copyright (c) 2015 by Chunwei Chen. All rights reserved.
+ * Copyright (c) 2014 by Chunwei Chen. All rights reserved.
+ * Copyright (c) 2016, 2019 by Delphix. All rights reserved.
  */
 
-#ifndef _ZFS_KMAP_H
-#define	_ZFS_KMAP_H
+#ifndef _ABD_OS_H
+#define	_ABD_OS_H
 
-#include <linux/highmem.h>
-#include <linux/uaccess.h>
-
-#ifdef HAVE_KMAP_LOCAL_PAGE
-/* 5.11 API change */
-#define	zfs_kmap_local(page)   kmap_local_page(page)
-#define	zfs_kunmap_local(addr) kunmap_local(addr)
-#else
-/* 2.6.37 API change */
-#define	zfs_kmap_local(page)   kmap_atomic(page)
-#define	zfs_kunmap_local(addr) kunmap_atomic(addr)
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-/* 5.0 API change - no more 'type' argument for access_ok() */
-#ifdef HAVE_ACCESS_OK_TYPE
-#define	zfs_access_ok(type, addr, size)	access_ok(type, addr, size)
-#else
-#define	zfs_access_ok(type, addr, size)	access_ok(addr, size)
+struct abd_scatter {
+	uint_t		abd_offset;
+	void		*abd_chunks[1]; /* actually variable-length */
+};
+
+struct abd_linear {
+	void		*abd_buf;
+};
+
+#ifdef __cplusplus
+}
 #endif
 
-#endif	/* _ZFS_KMAP_H */
+#endif	/* _ABD_H */

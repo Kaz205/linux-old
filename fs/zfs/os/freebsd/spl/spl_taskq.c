@@ -26,9 +26,6 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 #include <sys/param.h>
 #include <sys/kernel.h>
 #include <sys/kmem.h>
@@ -44,11 +41,6 @@ __FBSDID("$FreeBSD$");
 #endif
 
 #include <vm/uma.h>
-
-#if __FreeBSD_version < 1201522
-#define	taskqueue_start_threads_in_proc(tqp, count, pri, proc, name, ...) \
-    taskqueue_start_threads(tqp, count, pri, name, __VA_ARGS__)
-#endif
 
 static uint_t taskq_tsd;
 static uma_zone_t taskq_zone;

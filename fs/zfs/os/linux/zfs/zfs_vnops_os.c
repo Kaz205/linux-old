@@ -1500,7 +1500,7 @@ out:
  * we use the offset 2 for the '.zfs' directory.
  */
 int
-zfs_readdir(struct inode *ip, zpl_dir_context_t *ctx, cred_t *cr)
+zfs_readdir(struct inode *ip, struct dir_context *ctx, cred_t *cr)
 {
 	(void) cr;
 	znode_t		*zp = ITOZ(ip);
@@ -1606,7 +1606,7 @@ zfs_readdir(struct inode *ip, zpl_dir_context_t *ctx, cred_t *cr)
 			type = ZFS_DIRENT_TYPE(zap.za_first_integer);
 		}
 
-		done = !zpl_dir_emit(ctx, zap.za_name, strlen(zap.za_name),
+		done = !dir_emit(ctx, zap.za_name, strlen(zap.za_name),
 		    objnum, type);
 		if (done)
 			break;
@@ -3442,9 +3442,9 @@ zfs_link(znode_t *tdzp, znode_t *szp, char *name, cred_t *cr,
 	boolean_t	waited = B_FALSE;
 	boolean_t	is_tmpfile = 0;
 	uint64_t	txg;
-#ifdef HAVE_TMPFILE
+
 	is_tmpfile = (sip->i_nlink == 0 && (sip->i_state & I_LINKABLE));
-#endif
+
 	ASSERT(S_ISDIR(ZTOI(tdzp)->i_mode));
 
 	if (name == NULL)
@@ -3748,8 +3748,7 @@ zfs_putpage(struct inode *ip, struct page *pp, struct writeback_control *wbc,
 			/*
 			 * Speed up any non-sync page writebacks since
 			 * they may take several seconds to complete.
-			 * Refer to the comment in zpl_fsync() (when
-			 * HAVE_FSYNC_RANGE is defined) for details.
+			 * Refer to the comment in zpl_fsync() for details.
 			 */
 			if (atomic_load_32(&zp->z_async_writes_cnt) > 0) {
 				zil_commit(zfsvfs->z_log, zp->z_id);
