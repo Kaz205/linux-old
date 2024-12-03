@@ -1228,7 +1228,7 @@ static const struct ddcci_device_id *ddcci_match_id(const struct ddcci_device_id
 	return NULL;
 }
 
-static int ddcci_device_match(struct device *dev, struct device_driver *drv)
+static int ddcci_device_match(struct device *dev, const struct device_driver *drv)
 {
 	struct ddcci_device	*device = ddcci_verify_device(dev);
 	struct ddcci_driver	*driver;
