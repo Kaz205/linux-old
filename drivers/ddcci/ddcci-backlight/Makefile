@@ -25,7 +25,7 @@ MODDIR := $(KERNEL_MODLIB)/extra
 KDIR := $(KERNEL_MODLIB)/build
 PWD := $(shell pwd)
 
-obj-m := ddcci-backlight.o
+obj-$(CONFIG_DDCCI_BACKLIGHT) += ddcci-backlight.o
 src ?= $(PWD)
 obj ?= .
 ccflags-y := -I$(src)/../include

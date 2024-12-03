@@ -1,0 +1,4 @@
+config DDCCI_BACKLIGHT
+	tristate "DDCCI backlight Driver"
+	help
+	  DDCCI Driver for monitors.

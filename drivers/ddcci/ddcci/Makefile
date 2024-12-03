@@ -26,7 +26,7 @@ INCLUDEDIR := /usr/local/include
 KDIR := $(KERNEL_MODLIB)/build
 PWD := $(shell pwd)
 
-obj-m := ddcci.o
+obj-$(CONFIG_DDCCI) += ddcci.o
 
 src ?= $(PWD)
 obj ?= .

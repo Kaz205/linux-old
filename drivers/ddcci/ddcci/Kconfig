@@ -1,0 +1,4 @@
+config DDCCI
+	tristate "DDCCI Driver"
+	help
+	  DDCCI Driver for monitors.

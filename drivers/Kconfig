@@ -245,4 +245,8 @@ source "drivers/cdx/Kconfig"
 
 source "drivers/dpll/Kconfig"
 
+source "drivers/ddcci/ddcci-backlight/Kconfig"
+
+source "drivers/ddcci/ddcci/Kconfig"
+
 endmenu
