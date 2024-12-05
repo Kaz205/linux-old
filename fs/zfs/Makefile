@@ -82,13 +82,13 @@ clean: clean-Linux
 modules_uninstall-Linux-legacy:
 	$(RM) -r $(addprefix $(KMODDIR)/$(INSTALL_MOD_DIR)/,spl/ avl/ icp/ lua/ nvpair/ unicode/ zcommon/ zfs/ zstd/)
 
-KMODDIR := $(INSTALL_MOD_PATH)/lib/modules/6.11.10-geb3333ba1f8c
+KMODDIR := $(INSTALL_MOD_PATH)/lib/modules/6.11.11-gc9d12f80c162
 modules_install-Linux: modules_uninstall-Linux-legacy
 	@# Install the kernel modules
 	$(MAKE) -C /home/kazuki/linux M="$$PWD" modules_install \
 		INSTALL_MOD_PATH=$(INSTALL_MOD_PATH) \
 		INSTALL_MOD_DIR=$(INSTALL_MOD_DIR) \
-		KERNELRELEASE=6.11.10-geb3333ba1f8c
+		KERNELRELEASE=6.11.11-gc9d12f80c162
 	@# Remove extraneous build products when packaging
 	if [ -n "$(DESTDIR)" ]; then \
 		find $(KMODDIR) -name 'modules.*' -delete; \
@@ -99,11 +99,11 @@ modules_install-Linux: modules_uninstall-Linux-legacy
 	@# Naturally, depmod is less than amused by this.
 	@# So if we find it missing or with one of these present,
 	@# we check for the alternate path for the System.map
-	sysmap=$(INSTALL_MOD_PATH)/boot/System.map-6.11.10-geb3333ba1f8c; \
+	sysmap=$(INSTALL_MOD_PATH)/boot/System.map-6.11.11-gc9d12f80c162; \
 	{ [ -f "$$sysmap" ] && [ $$(wc -l < "$$sysmap") -ge 100 ]; } || \
-		sysmap=$(INSTALL_MOD_PATH)/usr/lib/debug/boot/System.map-6.11.10-geb3333ba1f8c; \
+		sysmap=$(INSTALL_MOD_PATH)/usr/lib/debug/boot/System.map-6.11.11-gc9d12f80c162; \
 	if [ -f $$sysmap ]; then \
-		depmod -ae -F $$sysmap 6.11.10-geb3333ba1f8c; \
+		depmod -ae -F $$sysmap 6.11.11-gc9d12f80c162; \
 	fi
 
 modules_install-FreeBSD:
@@ -113,8 +113,8 @@ modules_install-FreeBSD:
 modules_install: modules_install-Linux
 
 data_install-Linux:
-	@mkdir -p $(DESTDIR)//usr/src/zfs-2.2.7/6.11.10-geb3333ba1f8c
-	cp ../zfs.release ../zfs_config.h NONE $(DESTDIR)//usr/src/zfs-2.2.7/6.11.10-geb3333ba1f8c
+	@mkdir -p $(DESTDIR)//usr/src/zfs-2.2.7/6.11.11-gc9d12f80c162
+	cp ../zfs.release ../zfs_config.h NONE $(DESTDIR)//usr/src/zfs-2.2.7/6.11.11-gc9d12f80c162
 
 data_install-FreeBSD:
 	@
@@ -131,7 +131,7 @@ modules_uninstall-FreeBSD:
 modules_uninstall: modules_uninstall-Linux
 
 data_uninstall-Linux:
-	$(RM) $(addprefix $(DESTDIR)//usr/src/zfs-2.2.7/6.11.10-geb3333ba1f8c/,zfs.release zfs_config.h NONE)
+	$(RM) $(addprefix $(DESTDIR)//usr/src/zfs-2.2.7/6.11.11-gc9d12f80c162/,zfs.release zfs_config.h NONE)
 
 data_uninstall-FreeBSD:
 	@
