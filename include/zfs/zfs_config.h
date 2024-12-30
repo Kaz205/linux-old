@@ -510,7 +510,7 @@
 #define HAVE_PROC_OPS_STRUCT 1
 
 /* If available, contains the Python version number currently in use. */
-#define HAVE_PYTHON "3.12"
+#define HAVE_PYTHON "3.13"
 
 /* qat is enabled and existed */
 /* #undef HAVE_QAT */
