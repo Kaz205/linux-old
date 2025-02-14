@@ -57,7 +57,6 @@
 #include <sys/trace_zfs.h>
 #include <sys/aggsum.h>
 
-#ifdef _KERNEL
 /*
  * This is a limit on how many pages the ARC shrinker makes available for
  * eviction in response to one page allocation attempt.  Note that in
@@ -85,16 +84,21 @@ static int zfs_arc_shrinker_seeks = DEFAULT_SEEKS;
 #ifdef CONFIG_MEMORY_HOTPLUG
 static struct notifier_block arc_hotplug_callback_mem_nb;
 #endif
-#endif
 
 /*
  * Return a default max arc size based on the amount of physical memory.
+ * This may be overridden by tuning the zfs_arc_max module parameter.
  */
 uint64_t
 arc_default_max(uint64_t min, uint64_t allmem)
 {
-	/* Default to 1/2 of all memory. */
-	return (MAX(allmem / 2, min));
+	uint64_t size;
+
+	if (allmem >= 1 << 30)
+		size = allmem - (1 << 30);
+	else
+		size = min;
+	return (MAX(allmem * 5 / 8, size));
 }
 
 /*

@@ -103,6 +103,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/always-arch.m4 \
 	$(top_srcdir)/config/always-shellcheck.m4 \
 	$(top_srcdir)/config/always-system.m4 \
 	$(top_srcdir)/config/ax_code_coverage.m4 \
+	$(top_srcdir)/config/ax_compare_version.m4 \
 	$(top_srcdir)/config/ax_count_cpus.m4 \
 	$(top_srcdir)/config/ax_python_devel.m4 \
 	$(top_srcdir)/config/ax_restore_flags.m4 \
@@ -166,6 +167,7 @@ am__aclocal_m4_deps = $(top_srcdir)/config/always-arch.m4 \
 	$(top_srcdir)/config/kernel-pagemap-folio_wait_bit.m4 \
 	$(top_srcdir)/config/kernel-pde-data.m4 \
 	$(top_srcdir)/config/kernel-percpu.m4 \
+	$(top_srcdir)/config/kernel-pin-user-pages.m4 \
 	$(top_srcdir)/config/kernel-proc-operations.m4 \
 	$(top_srcdir)/config/kernel-readpages.m4 \
 	$(top_srcdir)/config/kernel-reclaim_state.m4 \
@@ -190,11 +192,11 @@ am__aclocal_m4_deps = $(top_srcdir)/config/always-arch.m4 \
 	$(top_srcdir)/config/kernel-truncate-setsize.m4 \
 	$(top_srcdir)/config/kernel-types.m4 \
 	$(top_srcdir)/config/kernel-usleep_range.m4 \
-	$(top_srcdir)/config/kernel-vfs-direct_IO.m4 \
 	$(top_srcdir)/config/kernel-vfs-file_range.m4 \
 	$(top_srcdir)/config/kernel-vfs-filemap_dirty_folio.m4 \
 	$(top_srcdir)/config/kernel-vfs-fsync.m4 \
 	$(top_srcdir)/config/kernel-vfs-iov_iter.m4 \
+	$(top_srcdir)/config/kernel-vfs-migrate_folio.m4 \
 	$(top_srcdir)/config/kernel-vfs-read_folio.m4 \
 	$(top_srcdir)/config/kernel-vfs-set_page_dirty.m4 \
 	$(top_srcdir)/config/kernel-writepage_t.m4 \
@@ -325,30 +327,30 @@ am__kernel_spl_sys_HEADERS_DIST = os/linux/spl/sys/acl.h \
 	os/linux/spl/sys/cmn_err.h os/linux/spl/sys/condvar.h \
 	os/linux/spl/sys/cred.h os/linux/spl/sys/ctype.h \
 	os/linux/spl/sys/debug.h os/linux/spl/sys/disp.h \
-	os/linux/spl/sys/dkio.h os/linux/spl/sys/errno.h \
-	os/linux/spl/sys/fcntl.h os/linux/spl/sys/file.h \
-	os/linux/spl/sys/inttypes.h os/linux/spl/sys/isa_defs.h \
-	os/linux/spl/sys/kmem.h os/linux/spl/sys/kmem_cache.h \
-	os/linux/spl/sys/kstat.h os/linux/spl/sys/list.h \
-	os/linux/spl/sys/misc.h os/linux/spl/sys/mod_os.h \
-	os/linux/spl/sys/mutex.h os/linux/spl/sys/param.h \
-	os/linux/spl/sys/proc.h os/linux/spl/sys/processor.h \
-	os/linux/spl/sys/procfs_list.h os/linux/spl/sys/random.h \
-	os/linux/spl/sys/rwlock.h os/linux/spl/sys/shrinker.h \
-	os/linux/spl/sys/sid.h os/linux/spl/sys/signal.h \
-	os/linux/spl/sys/simd.h os/linux/spl/sys/stat.h \
-	os/linux/spl/sys/string.h os/linux/spl/sys/sunddi.h \
-	os/linux/spl/sys/sysmacros.h os/linux/spl/sys/systeminfo.h \
-	os/linux/spl/sys/taskq.h os/linux/spl/sys/thread.h \
-	os/linux/spl/sys/time.h os/linux/spl/sys/timer.h \
-	os/linux/spl/sys/trace.h os/linux/spl/sys/trace_spl.h \
-	os/linux/spl/sys/trace_taskq.h os/linux/spl/sys/tsd.h \
-	os/linux/spl/sys/types.h os/linux/spl/sys/types32.h \
-	os/linux/spl/sys/uio.h os/linux/spl/sys/user.h \
-	os/linux/spl/sys/vfs.h os/linux/spl/sys/vmem.h \
-	os/linux/spl/sys/vmsystm.h os/linux/spl/sys/vnode.h \
-	os/linux/spl/sys/wait.h os/linux/spl/sys/wmsum.h \
-	os/linux/spl/sys/zmod.h os/linux/spl/sys/zone.h
+	os/linux/spl/sys/errno.h os/linux/spl/sys/fcntl.h \
+	os/linux/spl/sys/file.h os/linux/spl/sys/inttypes.h \
+	os/linux/spl/sys/isa_defs.h os/linux/spl/sys/kmem.h \
+	os/linux/spl/sys/kmem_cache.h os/linux/spl/sys/kstat.h \
+	os/linux/spl/sys/list.h os/linux/spl/sys/misc.h \
+	os/linux/spl/sys/mod_os.h os/linux/spl/sys/mutex.h \
+	os/linux/spl/sys/param.h os/linux/spl/sys/proc.h \
+	os/linux/spl/sys/processor.h os/linux/spl/sys/procfs_list.h \
+	os/linux/spl/sys/random.h os/linux/spl/sys/rwlock.h \
+	os/linux/spl/sys/shrinker.h os/linux/spl/sys/sid.h \
+	os/linux/spl/sys/signal.h os/linux/spl/sys/simd.h \
+	os/linux/spl/sys/stat.h os/linux/spl/sys/string.h \
+	os/linux/spl/sys/sunddi.h os/linux/spl/sys/sysmacros.h \
+	os/linux/spl/sys/systeminfo.h os/linux/spl/sys/taskq.h \
+	os/linux/spl/sys/thread.h os/linux/spl/sys/time.h \
+	os/linux/spl/sys/timer.h os/linux/spl/sys/trace.h \
+	os/linux/spl/sys/trace_spl.h os/linux/spl/sys/trace_taskq.h \
+	os/linux/spl/sys/tsd.h os/linux/spl/sys/types.h \
+	os/linux/spl/sys/types32.h os/linux/spl/sys/uio.h \
+	os/linux/spl/sys/user.h os/linux/spl/sys/vfs.h \
+	os/linux/spl/sys/vmem.h os/linux/spl/sys/vmsystm.h \
+	os/linux/spl/sys/vnode.h os/linux/spl/sys/wait.h \
+	os/linux/spl/sys/wmsum.h os/linux/spl/sys/zmod.h \
+	os/linux/spl/sys/zone.h
 am__kernel_sys_HEADERS_DIST = os/linux/zfs/sys/abd_os.h \
 	os/linux/zfs/sys/abd_impl_os.h os/linux/zfs/sys/policy.h \
 	os/linux/zfs/sys/trace_acl.h os/linux/zfs/sys/trace_arc.h \
@@ -373,8 +375,8 @@ am__nobase_kernel_HEADERS_DIST = cityhash.h zfeature_common.h \
 	sys/avl_impl.h sys/bitmap.h sys/bitops.h sys/blake3.h \
 	sys/blkptr.h sys/bplist.h sys/bpobj.h sys/bptree.h \
 	sys/bqueue.h sys/btree.h sys/brt.h sys/brt_impl.h \
-	sys/dataset_kstats.h sys/dbuf.h sys/ddt.h sys/dmu.h \
-	sys/dmu_impl.h sys/dmu_objset.h sys/dmu_recv.h \
+	sys/dataset_kstats.h sys/dbuf.h sys/ddt.h sys/ddt_impl.h \
+	sys/dmu.h sys/dmu_impl.h sys/dmu_objset.h sys/dmu_recv.h \
 	sys/dmu_redact.h sys/dmu_send.h sys/dmu_traverse.h \
 	sys/dmu_tx.h sys/dmu_zfetch.h sys/dnode.h sys/dsl_bookmark.h \
 	sys/dsl_crypt.h sys/dsl_dataset.h sys/dsl_deadlist.h \
@@ -420,8 +422,8 @@ am__nobase_libzfs_HEADERS_DIST = cityhash.h zfeature_common.h \
 	sys/avl_impl.h sys/bitmap.h sys/bitops.h sys/blake3.h \
 	sys/blkptr.h sys/bplist.h sys/bpobj.h sys/bptree.h \
 	sys/bqueue.h sys/btree.h sys/brt.h sys/brt_impl.h \
-	sys/dataset_kstats.h sys/dbuf.h sys/ddt.h sys/dmu.h \
-	sys/dmu_impl.h sys/dmu_objset.h sys/dmu_recv.h \
+	sys/dataset_kstats.h sys/dbuf.h sys/ddt.h sys/ddt_impl.h \
+	sys/dmu.h sys/dmu_impl.h sys/dmu_objset.h sys/dmu_recv.h \
 	sys/dmu_redact.h sys/dmu_send.h sys/dmu_traverse.h \
 	sys/dmu_tx.h sys/dmu_zfetch.h sys/dnode.h sys/dsl_bookmark.h \
 	sys/dsl_crypt.h sys/dsl_dataset.h sys/dsl_deadlist.h \
@@ -458,7 +460,7 @@ am__nobase_libzfs_HEADERS_DIST = cityhash.h zfeature_common.h \
 	sys/fm/fs/zfs.h sys/fs/zfs.h sys/lua/lauxlib.h sys/lua/lua.h \
 	sys/lua/luaconf.h sys/lua/lualib.h sys/sysevent/dev.h \
 	sys/sysevent/eventdefs.h sys/zstd/zstd.h libnvpair.h \
-	libuutil.h libuutil_common.h libuutil_impl.h libzfs.h \
+	libuutil.h libuutil_common.h libuutil_impl.h libzdb.h libzfs.h \
 	libzfs_core.h libzfsbootenv.h libzutil.h thread_pool.h
 am__noinst_HEADERS_DIST = os/freebsd/linux/compiler.h \
 	os/freebsd/linux/types.h os/freebsd/spl/acl/acl_common.h \
@@ -469,18 +471,17 @@ am__noinst_HEADERS_DIST = os/freebsd/linux/compiler.h \
 	os/freebsd/spl/sys/cmn_err.h os/freebsd/spl/sys/condvar.h \
 	os/freebsd/spl/sys/cred.h os/freebsd/spl/sys/ctype.h \
 	os/freebsd/spl/sys/debug.h os/freebsd/spl/sys/dirent.h \
-	os/freebsd/spl/sys/disp.h os/freebsd/spl/sys/dkio.h \
-	os/freebsd/spl/sys/fcntl.h os/freebsd/spl/sys/file.h \
-	os/freebsd/spl/sys/freebsd_rwlock.h os/freebsd/spl/sys/idmap.h \
-	os/freebsd/spl/sys/inttypes.h os/freebsd/spl/sys/isa_defs.h \
-	os/freebsd/spl/sys/kmem.h os/freebsd/spl/sys/kmem_cache.h \
-	os/freebsd/spl/sys/kstat.h os/freebsd/spl/sys/list.h \
-	os/freebsd/spl/sys/list_impl.h os/freebsd/spl/sys/lock.h \
-	os/freebsd/spl/sys/misc.h os/freebsd/spl/sys/mod_os.h \
-	os/freebsd/spl/sys/mode.h os/freebsd/spl/sys/mount.h \
-	os/freebsd/spl/sys/mutex.h os/freebsd/spl/sys/param.h \
-	os/freebsd/spl/sys/policy.h os/freebsd/spl/sys/proc.h \
-	os/freebsd/spl/sys/processor.h \
+	os/freebsd/spl/sys/disp.h os/freebsd/spl/sys/fcntl.h \
+	os/freebsd/spl/sys/file.h os/freebsd/spl/sys/freebsd_rwlock.h \
+	os/freebsd/spl/sys/idmap.h os/freebsd/spl/sys/inttypes.h \
+	os/freebsd/spl/sys/isa_defs.h os/freebsd/spl/sys/kmem.h \
+	os/freebsd/spl/sys/kmem_cache.h os/freebsd/spl/sys/kstat.h \
+	os/freebsd/spl/sys/list.h os/freebsd/spl/sys/list_impl.h \
+	os/freebsd/spl/sys/lock.h os/freebsd/spl/sys/misc.h \
+	os/freebsd/spl/sys/mod_os.h os/freebsd/spl/sys/mode.h \
+	os/freebsd/spl/sys/mount.h os/freebsd/spl/sys/mutex.h \
+	os/freebsd/spl/sys/param.h os/freebsd/spl/sys/policy.h \
+	os/freebsd/spl/sys/proc.h os/freebsd/spl/sys/processor.h \
 	os/freebsd/spl/sys/procfs_list.h os/freebsd/spl/sys/random.h \
 	os/freebsd/spl/sys/rwlock.h os/freebsd/spl/sys/sdt.h \
 	os/freebsd/spl/sys/sid.h os/freebsd/spl/sys/sig.h \
@@ -632,7 +633,9 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 INTLLIBS = 
 INTL_MACOSX_LIBS = 
 IS_SYSV_RC = true
+KERNEL_ARCH = 
 KERNEL_CC = 
+KERNEL_CROSS_COMPILE = 
 KERNEL_DEBUG_CFLAGS = 
 KERNEL_DEBUG_CPPFLAGS = -UDEBUG -DNDEBUG
 KERNEL_INFINITE_RECURSION = -Winfinite-recursion
@@ -677,7 +680,7 @@ LIBUUID_PC = uuid
 LINUX = /home/kazuki/linux
 LINUX_OBJ = /home/kazuki/linux
 LINUX_SYMBOLS = NONE
-LINUX_VERSION = 6.12.6-gf4738302ebc3
+LINUX_VERSION = 6.12.13-gbeb9d18aa231
 LIPO = 
 LN_S = ln -s
 LTLIBICONV = -liconv
@@ -706,10 +709,10 @@ OTOOL64 =
 PACKAGE = zfs
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = zfs
-PACKAGE_STRING = zfs 2.2.7
+PACKAGE_STRING = zfs 2.3.0
 PACKAGE_TARNAME = zfs
 PACKAGE_URL = 
-PACKAGE_VERSION = 2.2.7
+PACKAGE_VERSION = 2.3.0
 PARALLEL = 
 PATH_SEPARATOR = :
 PKG_CONFIG = /usr/bin/pkg-config
@@ -761,14 +764,14 @@ UBSAN_LDFLAGS =
 UBSAN_ZFS = _without_ubsan
 USE_NLS = yes
 VENDOR = arch
-VERSION = 2.2.7
+VERSION = 2.3.0
 WITH_DEBUG = 
 WITH_INVARIANTS = 
 XGETTEXT = /usr/bin/xgettext
 XGETTEXT_015 = /usr/bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
 ZFS_CONFIG = all
-ZFS_META_ALIAS = zfs-2.2.7-1
+ZFS_META_ALIAS = zfs-2.3.0-1
 ZFS_META_AUTHOR = OpenZFS
 ZFS_META_DATA = 
 ZFS_META_KVER_MAX = 6.12
@@ -779,7 +782,7 @@ ZFS_META_LT_CURRENT =
 ZFS_META_LT_REVISION = 
 ZFS_META_NAME = zfs
 ZFS_META_RELEASE = 1
-ZFS_META_VERSION = 2.2.7
+ZFS_META_VERSION = 2.3.0
 ZLIB_CFLAGS = 
 ZLIB_LIBS = -lz
 ZLIB_PC = zlib
@@ -800,7 +803,7 @@ am__rm_f_notfound =
 am__tar = tar --format=posix -chf - "$$tardir"
 am__untar = tar -xf -
 am__xargs_n = xargs -n
-bashcompletiondir = /etc/bash_completion.d
+bashcompletiondir = /usr/share/bash-completion/completions
 bindir = ${exec_prefix}/bin
 build = x86_64-pc-linux-gnu
 build_alias = 
@@ -930,7 +933,6 @@ zfsexecdir = ${exec_prefix}/libexec/zfs
 #	os/linux/spl/sys/ctype.h \
 #	os/linux/spl/sys/debug.h \
 #	os/linux/spl/sys/disp.h \
-#	os/linux/spl/sys/dkio.h \
 #	os/linux/spl/sys/errno.h \
 #	os/linux/spl/sys/fcntl.h \
 #	os/linux/spl/sys/file.h \
@@ -1005,7 +1007,6 @@ zfsexecdir = ${exec_prefix}/libexec/zfs
 #	os/freebsd/spl/sys/debug.h \
 #	os/freebsd/spl/sys/dirent.h \
 #	os/freebsd/spl/sys/disp.h \
-#	os/freebsd/spl/sys/dkio.h \
 #	os/freebsd/spl/sys/fcntl.h \
 #	os/freebsd/spl/sys/file.h \
 #	os/freebsd/spl/sys/freebsd_rwlock.h \
@@ -1111,6 +1112,7 @@ COMMON_H = \
 	sys/dataset_kstats.h \
 	sys/dbuf.h \
 	sys/ddt.h \
+	sys/ddt_impl.h \
 	sys/dmu.h \
 	sys/dmu_impl.h \
 	sys/dmu_objset.h \
@@ -1258,6 +1260,7 @@ USER_H = \
 	libuutil.h \
 	libuutil_common.h \
 	libuutil_impl.h \
+	libzdb.h \
 	libzfs.h \
 	libzfs_core.h \
 	libzfsbootenv.h \
